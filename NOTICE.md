@@ -16,3 +16,4 @@ sources below and stay theirs; they are not included here. See each source for i
 - cipher-readings (Paolo Rosson) — https://github.com/pangoleen/cipher-readings
 
 - Country flags in `flags/`: [flag-icons](https://github.com/lipis/flag-icons) by Panayiotis Lipiridis, MIT License.
+- Dot-matrix font in `fonts/` (subset): [DotGothic16](https://github.com/fontworks-fonts/DotGothic16) by Fontworks, SIL Open Font License 1.1 (`fonts/DotGothic16-OFL.txt`).

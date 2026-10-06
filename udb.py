@@ -522,11 +522,10 @@ def honor(names):
 
 JST = datetime.timezone(datetime.timedelta(hours=9), 'JST')
 def lcd(d):
-    """The last-fetch time as a small digital clock face (date, time, zone)."""
+    """The last-fetch time on a small dot-matrix LCD, like an electronic dictionary's screen."""
     try: x = datetime.datetime.fromisoformat(d).astimezone(JST)
     except Exception: return html.escape(d or '')
-    return (f'<span class="lcd" role="img" aria-label="{x:%Y-%m-%d %H:%M} JST"><span class="ld">{x:%Y.%m.%d}</span>'
-            f'<span class="lt">{x:%H}<i>:</i>{x:%M}</span><span class="lz">JST</span></span>')
+    return f'<span class="lcd" role="img" aria-label="{x:%Y-%m-%d %H:%M} JST">{x:%Y/%m/%d}&nbsp;{x:%H:%M}<span class="lz">JST</span></span>'
 
 def fmt_when_iso(d, en=False):
     """'2026-10-05' -> '2026年10月5日' / '5 Oct 2026'; '2026-10-06T12:40+09:00' -> '2026年10月6日 12:40（日本時間）' / '6 Oct 2026, 12:40 JST'."""
@@ -974,8 +973,10 @@ def build(db):
             '.side .acc{border-bottom:1px solid var(--line)}.side .acc summary{cursor:pointer;padding:10px 2px;list-style:none;display:flex;justify-content:space-between;align-items:center}.side .acc summary::-webkit-details-marker{display:none}.side .acc summary::after{content:"▾";color:var(--muted);transition:transform .15s}.side .acc[open] summary::after{transform:rotate(180deg)}.side .accb{padding:0 2px 12px}'
             '.side .navl{list-style:none;padding:0;margin:0}.side .navl li{margin:0;border-bottom:1px solid var(--line)}.side .navl a{display:block;padding:10px 2px;text-decoration:none;color:var(--ink)}.side .navl a:hover{color:var(--accent)}.side .seg.theme{margin:4px 0 6px}.seg.theme button{padding:7px 14px}'
             '.side .srcl .xs{flex:none;display:inline-flex;width:26px;height:26px;border-radius:6px;align-items:center;justify-content:center}.side .srcl .xs::before{content:"";width:13px;height:13px;background:var(--muted);-webkit-mask:url(ext.svg) center/contain no-repeat;mask:url(ext.svg) center/contain no-repeat}.side .srcl .xs:hover{background:var(--accent-soft)}.side .srcl .xs:hover::before{background:var(--accent)}.side .srcl li{display:flex;align-items:center;gap:6px}.side .srcl .mk{flex:none}.side .srcl a{flex:1;min-width:0;text-align:left}.cntp{flex:none;min-width:2.2em;text-align:center;font:600 11.5px/18px system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--accent-soft);border:1px solid var(--line);border-radius:999px;padding:0 7px}'
-            '.side .upd dd .lcd{display:inline-flex;align-items:baseline;gap:8px;padding:6px 10px;border-radius:6px;background:#0d120e;border:1px solid #233026;box-shadow:inset 0 0 10px rgba(0,0,0,.6);font:600 15px/1.1 ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:.06em;color:#7dff9a;text-shadow:0 0 4px rgba(125,255,154,.65),0 0 10px rgba(125,255,154,.25)}'
-            '.side .upd dd .lt{font-size:19px}.side .upd dd .lt i{font-style:normal;animation:lcdb 1s steps(1) infinite}.side .upd dd .lz{font-size:10.5px;opacity:.75}@keyframes lcdb{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.side .upd dd .lt i{animation:none}}'
+            '@font-face{font-family:DotLCD;src:url(fonts/DotGothic16-sub.woff2) format("woff2");font-display:swap}'
+            '.side .upd dd .lcd{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap;padding:5px 10px;border-radius:3px;font:16px/1.2 DotLCD,ui-monospace,monospace;letter-spacing:.06em;color:#2b3324;'
+            'background:#b9c2a0 repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0 1px,transparent 1px 2px);border:2px solid #8e977a;box-shadow:inset 0 1px 4px rgba(0,0,0,.28)}'
+            '.side .upd dd .lz{font-size:11px;opacity:.8}'
             '.side .upd{align-items:center}.side .upd dt{white-space:nowrap}'
             '.side ul{margin:0;padding-left:1.1em;font-size:14px;line-height:1.65}.side ul.srcl{list-style:none;padding:0;margin:0 0 8px}.side .srcl li{margin:6px 0}.side li{margin:4px 0}.side .upd{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:10px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px}.side .upd dt{color:var(--muted);font-weight:600}.side .upd dd{margin:0;font-variant-numeric:tabular-nums}.side .lead{font-size:14px;line-height:1.7;margin:0 0 8px}.side .note{font-size:13.5px;line-height:1.7;margin:0}'
             '.also{font-size:13.5px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)}.also .m{font-size:12px}'
