@@ -83,7 +83,7 @@ def write(CSS, head, BAR, LANGJS, js, CJ, MJ, SIJ, T, menu_links):
         "else fetch('c/'+id.replace(/[^A-Za-z0-9]+/g,'-')+'.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(x){render(x);})"
         ".catch(function(){box.innerHTML='<p>'+T('この暗号は見つかりませんでした。','This case was not found.')+' <a href=\"./\">Cryptoole</a></p>';});"
         "var tipOn=null;document.addEventListener('click',function(ev){var a=ev.target.closest('.sn');if(a&&matchMedia('(hover: none)').matches&&tipOn!==a){ev.preventDefault();if(tipOn)tipOn.classList.remove('tip');a.classList.add('tip');tipOn=a;return;}if(tipOn&&!a){tipOn.classList.remove('tip');tipOn=null;}});")
-    css = CSS + sidemenu.CSS + (
+    css = CSS + sidemenu.CSS + sidemenu.SPIN_CSS + (
         'a.ext::after{content:\"\";display:inline-block;width:.72em;height:.72em;margin-left:4px;vertical-align:.02em;background:var(--muted);-webkit-mask:url(ext.svg) center/contain no-repeat;mask:url(ext.svg) center/contain no-repeat}.tn.ext::after,.sn.ext::after{content:none}'
         '.exs h2{margin:12px 0 4px;padding-bottom:4px}.rls h2{margin-top:24px}'
         '.exs{border:1px solid var(--line);border-radius:10px;padding:4px 14px 10px;background:var(--paper)}.exn{font-size:12.5px;color:var(--muted);margin:2px 0 6px}'
@@ -139,7 +139,7 @@ def write(CSS, head, BAR, LANGJS, js, CJ, MJ, SIJ, T, menu_links):
     menu = sidemenu.drawer(T, menu_links)
     bar = sidemenu.cbar(BAR, T)
     page = (f'{head}{sidemenu.EARLY}{sidemenu.ICON}<title>Cryptoole</title><meta name="author" content="satorunet"><meta name="robots" content="noindex">\n'
-            f'<style>{css}</style></head><body><main>\n{bar}\n<div id="sp"><p>…</p></div>\n'
+            f'<style>{css}</style></head><body><main>\n{bar}\n<div id="sp"><p class="loading" role="status"><span class="t" lang="ja">読み込み中…</span><span class="t" lang="en">Loading…</span></p></div>\n'
             f'<footer>satorunet · <a href="./">Cryptoole</a> · <a href="api.html">API</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a></footer>\n{menu}\n</main>\n'
             f'<script>(function(){{{LANGJS}{sidemenu.JS}{page_js}}})();</script></body></html>\n')
     page = page.replace('href="/crypt/', 'href="https://satoru.net/crypt/')

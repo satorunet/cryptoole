@@ -1222,7 +1222,7 @@ def build(db):
             f'<meta property="og:title" content="Cryptoole — 未解決暗号のオープン検索エンジン"><meta property="og:description" content="Cryptiana・cyphersolver・CryptoCellar・DECODE・cipher-readings の未解決暗号を一元的に検索。状況・種類・言語・地域・年代で横断して絞り込める。">'
             f'<meta property="og:image" content="{sidemenu.SEARCH_URL}og.png?v={int((H / 'og.png').stat().st_mtime) if (H / 'og.png').exists() else 0}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Cryptoole — 未解決暗号のオープン検索エンジン">'
             f'<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Cryptoole — 未解決暗号のオープン検索エンジン"><meta name="twitter:description" content="未解決の歴史的暗号を一元的に検索できるエンジン。"><meta name="twitter:image" content="{sidemenu.SEARCH_URL}og.png?v={int((H / 'og.png').stat().st_mtime) if (H / 'og.png').exists() else 0}">\n'
-            f'<style>{CSS}{sidemenu.LOGO_CSS}{sidemenu.GH_CSS}</style></head><body><main>\n{BAR}\n{body}\n</main>\n<script>(function(){{{LANGJS}{js}}})();</script></body></html>\n')
+            f'<style>{CSS}{sidemenu.LOGO_CSS}{sidemenu.GH_CSS}{sidemenu.SPIN_CSS}</style></head><body><main>\n{BAR}\n{body}\n</main>\n<script>(function(){{{LANGJS}{js}}})();</script></body></html>\n')
     page = page.replace('href="/crypt/', 'href="https://satoru.net/crypt/')   # served from cryptoole.satoru.net: links back to satoru.net are absolute
     (H / 'index.html').write_text(page, encoding='utf-8')
     (H / 'udb.py.txt').write_text(Path(__file__).read_text(encoding='utf-8'), encoding='utf-8')
