@@ -109,7 +109,7 @@ def write(CSS, head, BAR, LANGJS, T, menu_links, recs, SRC, MARK, COUNTRY):
             days = sorted(r['solved'] for r in recent if r['solved'][8:] != '00')
             if days:
                 latest = sorted((r for r in recent if r['solved'][8:] != '00'), key=lambda r: r['solved'], reverse=True)[:12]
-                sec['time'].append(f'<section><h2>{T("最近の解読", "Recent solves")}</h2><ul class="rl">'
+                sec['top'].insert(1, f'<section><h2>{T("最近の解読", "Recent solves")}</h2><ul class="rl">'
                            + ''.join(f'<li><span class="d">{r["solved"]}</span><a href="case.html?id={e(r["row"])}">{T(e(r["tj"]), e(r["te"]))}</a>'
                                      + (f'<span class="who">{e("・".join(r["solvers"]))}</span>' if r['solvers'] else '') + '</li>' for r in latest) + '</ul></section>')
         cum, pts = 0, []
