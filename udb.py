@@ -1163,7 +1163,7 @@ def build(db):
           ".catch(function(){ul.removeAttribute('aria-busy');ul.innerHTML='<li>'+T('読み込めませんでした。','Could not load the index.')+'</li>';});"
           "more.addEventListener('click',function(){run(true);});"
           "var fn=document.getElementById('fnav'),fu=fn.querySelector('[data-go=top]'),fd=fn.querySelector('[data-go=bottom]'),ft=0;"
-          "function fnv(){var y=scrollY,h=document.documentElement.scrollHeight-innerHeight;fu.hidden=y<400;fd.hidden=h<800||y>h-80;}"
+          "function fnv(){var y=scrollY,h=document.documentElement.scrollHeight-innerHeight;fu.hidden=y<400;fd.hidden=h<800||y<200||y>h-80;}"
           "addEventListener('scroll',function(){if(!ft)ft=requestAnimationFrame(function(){ft=0;fnv();});},{passive:true});addEventListener('resize',fnv);"
           "fu.addEventListener('click',function(){scrollTo({top:0,behavior:'smooth'});});fd.addEventListener('click',function(){scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'});});"
           "new MutationObserver(fnv).observe(ul,{childList:true});"
