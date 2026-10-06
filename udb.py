@@ -622,7 +622,7 @@ def selects(rs):
     # advanced search opens as a floating window (<dialog>)
     advb = ('<button type="button" class="advb" id="advbtn" aria-haspopup="dialog" title="詳細検索 / Advanced search" aria-label="詳細検索 / Advanced search">'
             '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span id="advn"></span></button>')
-    return ('<div class="bar1">' + seg + '<span class="brk"></span>' + sortb + advb + '</div><div class="conds" id="conds" aria-live="polite"></div>'
+    return ('<div class="bar1">' + seg + '<span class="brk"></span>' + sortb + advb + '</div><div class="conds" id="conds" aria-live="polite"></div><p class="hitn" id="hitn" aria-live="polite" hidden></p>'
             + f'<dialog class="adv" id="adv" aria-label="詳細検索 / Advanced search"><div class="advh"><b>{T("詳細検索", "Advanced search")}</b>'
             + f'<button type="button" class="advx" id="advclose" aria-label="閉じる / Close">×</button></div>'
             + '<div class="filters">' + ''.join(out) + '</div>'
@@ -966,7 +966,7 @@ def build(db):
             '.sortm{position:absolute;z-index:30;top:calc(100% + 4px);left:0;min-width:15em;background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px;display:flex;flex-direction:column}'
             '.sortm button{font:inherit;font-size:14px;text-align:left;border:0;background:none;color:var(--ink);padding:8px 10px 8px 26px;border-radius:7px;cursor:pointer;position:relative}'
             '.sortm button:hover{background:var(--accent-soft)}.sortm button[aria-checked="true"]::before{content:"✓";position:absolute;left:9px;color:var(--accent)}'
-            '.nohit{text-align:center;padding:28px 12px;border:1px dashed var(--line);border-radius:12px;margin:12px 0;color:var(--muted)}.nohit p{margin:4px 0}.nohit p:first-child{font-size:16px;color:var(--ink);font-weight:600}.nohit .nh2{font-size:13.5px}.nohit .fs-reset{margin-top:10px}'
+            '.hitn{margin:2px 0 6px;font-size:13px;color:var(--muted)}.hitn b{color:var(--ink);font-weight:700}.nohit{text-align:center;padding:28px 12px;border:1px dashed var(--line);border-radius:12px;margin:12px 0;color:var(--muted)}.nohit p{margin:4px 0}.nohit p:first-child{font-size:16px;color:var(--ink);font-weight:600}.nohit .nh2{font-size:13.5px}.nohit .fs-reset{margin-top:10px}'
             '.qw input{padding-right:2.4em!important}.qw input::-webkit-search-cancel-button{display:none}.qx{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:0;border-radius:999px;background:var(--line);color:var(--ink);font-size:18px;line-height:1;cursor:pointer}.qx:hover{background:var(--accent);color:#fff}'
             '.morew{text-align:center;margin:14px 0}.more{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--paper);color:var(--accent);border-radius:999px;padding:8px 22px;cursor:pointer}'
             '.fs-reset{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer}.gone{opacity:.55}'
@@ -1150,7 +1150,7 @@ def build(db):
           "var fld={date:'k','date-desc':'k',solved:'s','solved-asc':'s',added:'a',size:'k'}[mode],up=(mode==='date'||mode==='solved-asc');"
           "hits=D.filter(function(x){return ok(x,w);});if(mode==='pages')hits.sort(function(a,b){return ((b.pg||0)-(a.pg||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else if(mode==='size')hits.sort(function(a,b){return ((b.mn||0)-(a.mn||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else hits.sort(function(a,b){var x=a[fld]||'',y=b[fld]||'';if(x===y)return a.k<b.k?-1:(a.k>b.k?1:(a.i<b.i?-1:1));if(!x)return 1;if(!y)return -1;return up?(x<y?-1:1):(x<y?1:-1);});total=hits.length;}"
           "var page=hits.slice(off,off+(off?PAGE*2:PAGE)),h=page.map(row).join('');if(keep)ul.insertAdjacentHTML('beforeend',h);else ul.innerHTML=h;for(var z=off;z<ul.children.length;z++)hl(ul.children[z]);"
-          "ul.removeAttribute('aria-busy');more.hidden=ul.children.length>=total;document.getElementById('nohit').hidden=total>0;"
+          "ul.removeAttribute('aria-busy');more.hidden=ul.children.length>=total;document.getElementById('nohit').hidden=total>0;var hn=document.getElementById('hitn'),act=q.value.trim()||f.cat!=='all'||ADV.some(function(g){return f[g]!=='all';});hn.hidden=!act||!total;if(act)hn.innerHTML=T('<b>'+total.toLocaleString()+'</b> 件ヒット','<b>'+total.toLocaleString()+'</b> '+(total===1?'result':'results'));"
           "var ac=document.getElementById('advcount');if(ac)ac.textContent=total+' / '+D.length;}"
           "fetch('idx.json').then(function(r){return r.json();}).then(function(d){D=d;D.forEach(function(x){x._t=(x.tj+' '+x.te+' '+x.mj+' '+x.me+' '+(x.n||'')+' '+x.i+' '+(x.g||'')+' '+(x.ms||'')).toLowerCase();delete x.ms;});run();})"
           ".catch(function(){ul.removeAttribute('aria-busy');ul.innerHTML='<li>'+T('読み込めませんでした。','Could not load the index.')+'</li>';});"
