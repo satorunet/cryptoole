@@ -145,7 +145,7 @@ def write(CSS, head, BAR, LANGJS, T, menu_links, recs, SRC, MARK, COUNTRY):
     for r in recs: by_k[r['cc']][r['top']] += 1
     top = sorted((k for k in by_k if k in cn), key=lambda k: -sum(by_k[k].values()))[:15]
     sec['ctry'].append(f'<section><h2>{T("国ごと（出自・上位15）", "By country of origin (top 15)")}</h2>' + legend(T)
-               + stack([(T(*cn[k]), by_k[k]) for k in top] + [(T('不明', 'unknown'), by_k['xx'])], '9em') + '</section>')
+               + stack([(f'<img class="flag" src="flags/{k.lower()}.svg" alt="" width="20" height="15" loading="lazy">' + T(*cn[k]), by_k[k]) for k in top] + [('<span class="flag nf"></span>' + T('不明', 'unknown'), by_k['xx'])], '11em') + '</section>')
 
     body = (f'<p class="crumb"><a href="./" id="back">{T("検索へ戻る", "Back to search")}</a></p><h1>{T("未解読暗号の解読状況統計", "Decipherment statistics of unsolved ciphers")}</h1>'
             + '<div id="stabs-pin"></div><div class="stabs" role="tablist" aria-label="統計 / Statistics">' + ''.join(f'<button type="button" role="tab" data-tab="{k}" aria-selected="false">{T(ja, en)}</button>' for k, ja, en in TABS if sec[k]) + '<span class="sind" aria-hidden="true"></span></div>'
@@ -153,6 +153,7 @@ def write(CSS, head, BAR, LANGJS, T, menu_links, recs, SRC, MARK, COUNTRY):
             + f'<p class="note upd">{T("集計日", "Counted")} {datetime.date.today().isoformat()}</p>')
     css = CSS + sidemenu.CSS + sidemenu.LOGO_CSS + (
         'h1{font-size:24px;margin:4px 0 12px}.tp h2{font-size:17px;margin:26px 0 6px;padding-top:6px;border-top:1px solid var(--line)}.note{font-size:13px;color:var(--muted);margin:4px 0 10px}'
+        '.flag{display:inline-block;width:20px;height:15px;vertical-align:-2px;margin-right:6px;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.14);object-fit:cover}.flag.nf{background:var(--line);box-shadow:none}'
         '.crumb{margin:4px 0 6px;font-size:14px}#back{display:inline-flex;align-items:center;gap:6px}#back::before{content:"";width:.85em;height:.85em;background:currentColor;-webkit-mask:url(back.svg) center/contain no-repeat;mask:url(back.svg) center/contain no-repeat}'
         '.kpi{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper)}'
         '.kpi div{padding:10px 8px;text-align:center;border-right:1px solid var(--line);font-size:12.5px;color:var(--c,var(--muted));font-weight:600}.kpi div:last-child{border-right:0}'

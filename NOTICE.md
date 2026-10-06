@@ -14,3 +14,5 @@ sources below and stay theirs; they are not included here. See each source for i
 - CryptoCellar (Frode Weierud) — https://cryptocellar.org/
 - DECODE (DECRYPT project) — https://de-crypt.org/
 - cipher-readings (Paolo Rosson) — https://github.com/pangoleen/cipher-readings
+
+- Country flags in `flags/`: [flag-icons](https://github.com/lipis/flag-icons) by Panayiotis Lipiridis, MIT License.
