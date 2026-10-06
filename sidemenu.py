@@ -38,7 +38,7 @@ def drawer(T, links, title=('メニュー', 'Menu')):
     lis = ''.join(f'<li><a href="{h}"{' class="gh"' if 'github.com' in h else ''}>{T(ja, en)}</a></li>' for h, ja, en in links)
     return (f'<dialog class="side" id="side" aria-label="メニュー / Menu"><div class="advh"><b>{T(*title)}</b>' + LANGHEAD +
             '<button type="button" class="advx" id="sideclose" aria-label="閉じる / Close">×</button></div>'
-            + f'<section><h2>{T("情報", "Info")}</h2><ul class="navl">{lis}</ul></section>' + THEME + '</dialog>')
+            + f'<section><ul class="navl">{lis}</ul></section>' + THEME + '</dialog>')
 
 TAGLINE = ('未解決暗号の<wbr>オープン<wbr>検索エンジン', 'open search engine for unsolved historical ciphers')
 def cbar(BAR, T):

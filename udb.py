@@ -1136,7 +1136,7 @@ def build(db):
             f'<ul class="ul" id="ul" aria-busy="true"></ul><div class="nohit" id="nohit" hidden><p>{T("該当する暗号は見つかりませんでした。", "No ciphers match.")}</p><p class="nh2">{T("検索語を減らすか、条件を外してみてください。", "Try fewer words or remove a condition.")}</p><button type="button" class="fs-reset" id="nhclear">{T("条件をクリア", "Clear all")}</button></div><div class="morew"><button type="button" class="more" id="more" hidden>{T("さらに表示", "Show more")}</button></div>'
             # side menu (drawer) with the explanation and the sources
             f'<dialog class="side" id="side" aria-label="メニュー / Menu"><div class="advh"><b>{T("メニュー", "Menu")}</b>' + sidemenu.LANGHEAD + f'<button type="button" class="advx" id="sideclose" aria-label="閉じる / Close">×</button></div>'
-            f'<section><h2>{T("情報", "Info")}</h2>'
+            f'<section>'
             f'<details class="acc"><summary>{T("このデータベースについて", "About this database")}</summary><div class="accb">'
             f'<p class="lead">{T(f"{SN} の<wbr>暗号の<wbr>一覧を<wbr>一元的に<wbr>管理。<wbr>状況・<wbr>種類・<wbr>言語・<wbr>地域・<wbr>年代で<wbr>横断して<wbr>絞り込める", f"The {SN_EN} lists of unsolved ciphers managed in one place, filterable across sources by status, language, region and date")}</p>'
             '<ul>'
