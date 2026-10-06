@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS same_auto(src TEXT NOT NULL, key TEXT NOT NULL, rid T
 CREATE TABLE IF NOT EXISTS changes(id INTEGER PRIMARY KEY, date TEXT NOT NULL, src TEXT NOT NULL, key TEXT NOT NULL, kind TEXT NOT NULL, old TEXT NOT NULL DEFAULT '', new TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS bw_note(src TEXT NOT NULL, key TEXT NOT NULL, slug TEXT NOT NULL, checked TEXT NOT NULL, PRIMARY KEY(src, key, slug));
 '''
-SRC = {'cryptiana': ('Cryptiana（友清氏）', 'Cryptiana (Tomokiyo)', 'https://cryptiana.web.fc2.com/code/unsolved.htm'),
+SRC = {'cryptiana': ('Cryptiana（S. Tomokiyo）', 'Cryptiana (S. Tomokiyo)', 'https://cryptiana.web.fc2.com/code/unsolved.htm'),
        'cyphersolver': ('cyphersolver（Bourdeau）', 'cyphersolver (Bourdeau)', 'https://dbourdeau.github.io/cyphersolver/catalogue.html'),
        'cryptocellar': ('CryptoCellar（Weierud）', 'CryptoCellar (Weierud)', 'https://cryptocellar.org/bgac/'),
        'decode': ('DECODE（DECRYPT）', 'DECODE (DECRYPT)', 'https://de-crypt.org/decrypt-web/RecordsList'),

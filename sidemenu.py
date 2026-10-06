@@ -35,7 +35,7 @@ EARLY = "<script>try{var th=localStorage.getItem('crypt-theme');if(th==='light'|
 JS = SE_JS + "var tb=document.querySelectorAll('[data-theme-set]');function th(v,save){var r=document.documentElement;if(v==='auto')delete r.dataset.theme;else r.dataset.theme=v;tb.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.themeSet===v));});if(save){try{localStorage.setItem('crypt-theme',v);}catch(e){}}}th(document.documentElement.dataset.theme||'auto',false);tb.forEach(function(b){b.addEventListener('click',function(){th(b.dataset.themeSet,true);});});var sd=document.getElementById('side');document.getElementById('menubtn').addEventListener('click',function(){window.cse(1568,1568,.035,'square',.05);if(sd.showModal)sd.showModal();else sd.setAttribute('open','');});function sc(){if(sd.close)sd.close();else sd.removeAttribute('open');}document.getElementById('sideclose').addEventListener('click',sc);sd.addEventListener('click',function(ev){if(ev.target!==sd)return;var r=sd.getBoundingClientRect();if(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom)sc();});"
 
 def two(s):
-    """'Cryptiana（友清氏）' / 'cyphersolver (Bourdeau)' -> the name, with the bracketed part as a small second line."""
+    """'Cryptiana（S. Tomokiyo）' / 'cyphersolver (Bourdeau)' -> the name, with the bracketed part as a small second line."""
     m = re.match(r'(.+?)\s*[（(](.+)[）)]\s*$', s)
     return f'<span class="nm">{m.group(1)}</span><span class="sub">{m.group(2)}</span>' if m else s
 
