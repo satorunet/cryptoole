@@ -1,0 +1,17 @@
+# Only the source is versioned. Databases, fetched source data and generated pages stay on the server.
+*
+!.gitignore
+!README.md
+!LICENSE
+!NOTICE.md
+!*.py
+!api.cgi
+!ID-SPEC.md
+!data/
+!data/attributes.csv
+!data/relations.csv
+!data/image-rights.md
+!emblem.svg
+!ext.svg
+!back.svg
+!google.svg
