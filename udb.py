@@ -1081,6 +1081,8 @@ def build(db):
         if x.get('m'):
             bw = x.get('bw', []) + [z for mm in x['m'] for z in BWI.get(mm[6], [])]
             if bw: x['bw'] = [z for i, z in enumerate(bw) if all(z[0] != y[0] for y in bw[:i])]
+    for x in D:   # a row with a Bourdeau write-up carries his mark in the list too
+        if x.get('bw') and 'cyphersolver' not in x['S']: x['S'] = x['S'] + ['cyphersolver']
     # the record type is shown as an icon, not as a "鍵：/Key:" prefix in the title
     untype = lambda s, ja: (lambda u: ('（不明）' if ja else '(unknown)') if u in ('', '...', '…') else u)(re.sub(r'^(鍵：|Key: )', '', s or '').strip())
     for x in D:
