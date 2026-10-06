@@ -1068,8 +1068,8 @@ def build(db):
     cnt = lambda col, v: sum(1 for r in rs if (v in r['srcs'] if col == 'src' else r[col] == v))
     T_plain = lambda n: f'{n:,} 件 / {n:,} entries'
     chips = selects(rs)
-    # each source links to the search filtered by it, with the number of rows it appears in
-    srcs = '<ul class="srcl">' + ''.join(f'<li>{mark(k, link=False, icon=False)}<a href="./?source={k}" title="{e(v[0])} / {e(v[1])}">{T(*v[:2])}</a><span class="cntp" title="{T_plain(cnt("src", k))}">{cnt("src", k):,}</span></li>' for k, v in SRC.items()) + '</ul>'
+    # each source links to the search filtered by it, with the number of rows it appears in; most rows first
+    srcs = '<ul class="srcl">' + ''.join(f'<li>{mark(k, link=False, icon=False)}<a href="./?source={k}" title="{e(v[0])} / {e(v[1])}">{T(*v[:2])}</a><span class="cntp" title="{T_plain(cnt("src", k))}">{cnt("src", k):,}</span></li>' for k, v in sorted(SRC.items(), key=lambda kv: -cnt('src', kv[0]))) + '</ul>'
     upd = max((r['last_seen'] for r in rs), default='')
     m = db.execute("SELECT v FROM meta WHERE k='last_fetch'").fetchone() if db.execute("SELECT 1 FROM sqlite_master WHERE name='meta'").fetchone() else None
     if m: upd = m[0]   # the time of the last fetch, not just the day
