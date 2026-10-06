@@ -609,14 +609,14 @@ def selects(rs):
         out.append(f'<label class="fs"><span>{T(lj, le)}</span><select data-g="{g}">' + o('all', 'すべて', 'All')
                    + ''.join(o(k, f'{ja}（{c}）', f'{en} ({c})') for k, (ja, en), c in items if c) + '</select></label>')
     # one-tap order toggle: the icon shows the current order (oldest at top = arrow down the years)
-    sortb = ('<div class="sortw"><button type="button" class="fs-sort" id="sort" aria-haspopup="menu" aria-expanded="false" title="並び順 / Order">'
+    sortb = ('<button type="button" class="fs-dir" id="sortdir" title="並び順の向き / Direction" aria-label="並び順の向きを切り替える / Reverse the order">'
+               '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'
+               '<div class="sortw"><button type="button" class="fs-sort" id="sort" aria-haspopup="menu" aria-expanded="false" title="並び順 / Order">'
                '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
                '<path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg><span id="sortlab"></span></button>'
                '<div class="sortm" id="sortm" role="menu" hidden>'
                + ''.join(f'<button type="button" role="menuitemradio" data-sort="{k}" aria-checked="false" data-ja="{e(ja)}" data-en="{e(en)}">{T(e(ja), e(en))}</button>' for k, (ja, en) in SORTS)
-               + '</div></div>'
-               '<button type="button" class="fs-dir" id="sortdir" title="並び順の向き / Direction" aria-label="並び順の向きを切り替える / Reverse the order">'
-               '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>')
+               + '</div></div>')
     
     out.append(f'<button type="button" class="fs-reset" id="reset">{T("条件をクリア", "Clear")}</button>')
     # advanced search opens as a floating window (<dialog>)
@@ -965,7 +965,7 @@ def build(db):
             '.advb.on{background:var(--accent-soft);border-color:var(--accent)}.fs select.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}.fs-sort.on{border-color:var(--accent);color:var(--accent)}'
             '.sortw{position:relative}.fs-sort{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;cursor:pointer;font:inherit;font-size:13px}.fs-sort:hover{border-color:var(--accent);color:var(--accent)}'
             '.sortm{position:absolute;z-index:30;top:calc(100% + 4px);left:0;min-width:15em;background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px;display:flex;flex-direction:column}'
-            '.fs-dir{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;cursor:pointer;margin-left:-2px}.fs-dir:hover{background:var(--accent-soft)}.fs-dir svg{transition:transform .25s}.fs-dir.up svg{transform:rotate(180deg)}'
+            '.fs-dir{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;cursor:pointer}.fs-dir:hover{background:var(--accent-soft)}.fs-dir svg{transition:transform .25s}.fs-dir.up svg{transform:rotate(180deg)}'
             '.sortm button{font:inherit;font-size:14px;text-align:left;border:0;background:none;color:var(--ink);padding:8px 10px 8px 26px;border-radius:7px;cursor:pointer;position:relative}'
             '.sortm button:hover{background:var(--accent-soft)}.sortm button[aria-checked="true"]::before{content:"✓";position:absolute;left:9px;color:var(--accent)}'
             '.fnav{position:fixed;right:12px;top:55%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:10px}.fnav button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 92%,transparent);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}.fnav button:hover,.fnav button:focus-visible,.fnav button:active{opacity:1;background:var(--accent-soft);color:var(--accent)}.fnav button{opacity:.55;transform:scale(1);transition:opacity .4s ease,transform .4s ease,visibility 0s linear 0s}.fnav button[hidden]{display:flex!important;visibility:hidden;opacity:0;transform:scale(.8);pointer-events:none;transition:opacity .4s ease,transform .4s ease,visibility 0s linear .4s}@media (prefers-reduced-motion:reduce){.fnav button,.fnav button[hidden]{transition:none}}'
