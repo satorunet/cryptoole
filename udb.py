@@ -1123,7 +1123,7 @@ def build(db):
     T_plain = lambda n: f'{n:,} 件 / {n:,} entries'
     chips = selects(rs)
     # each source links to the search filtered by it, with the number of rows it appears in; most rows first
-    srcs = '<ul class="srcl">' + ''.join(f'<li>{mark(k, link=False, icon=False)}<a href="./?source={k}" title="{e(v[0])} / {e(v[1])}">{T(*v[:2])}</a><span class="cntp" title="{T_plain(cnt("src", k))}">{cnt("src", k):,}</span><a class="xs" href="{e(v[2])}" target="_blank" rel="noopener external" title="{e(v[0])} / {e(v[1])} ↗" aria-label="{e(v[1])} (external site)"></a></li>' for k, v in sorted(SRC.items(), key=lambda kv: -cnt('src', kv[0]))) + '</ul>'
+    srcs = '<ul class="srcl">' + ''.join(f'<li>{mark(k, link=False, icon=False)}<a href="./?source={k}" title="{e(v[0])} / {e(v[1])}">{T(sidemenu.two(v[0]), sidemenu.two(v[1]))}</a><span class="cntp" title="{T_plain(cnt("src", k))}">{cnt("src", k):,}</span><a class="xs" href="{e(v[2])}" target="_blank" rel="noopener external" title="{e(v[0])} / {e(v[1])} ↗" aria-label="{e(v[1])} (external site)"></a></li>' for k, v in sorted(SRC.items(), key=lambda kv: -cnt('src', kv[0]))) + '</ul>'
     upd = max((r['last_seen'] for r in rs), default='')
     m = db.execute("SELECT v FROM meta WHERE k='last_fetch'").fetchone() if db.execute("SELECT 1 FROM sqlite_master WHERE name='meta'").fetchone() else None
     if m: upd = m[0]   # the time of the last fetch, not just the day
@@ -1149,7 +1149,7 @@ def build(db):
             + srcs +
             f'<dl class="upd"><dt>{T("最終取得", "Last fetched")}</dt><dd>{T(fmt_when_iso(upd), fmt_when_iso(upd, True))}</dd></dl>'
             '</div></details>'
-            '<ul class="navl">' + ''.join(f'<li><a href="{h}"{' class="gh"' if 'github.com' in h else ''}>{T(ja, en)}</a></li>' for h, ja, en in MENU[1:]) + '</ul></section>'
+            '<ul class="navl">' + ''.join(f'<li><a href="{h}"{' class="gh"' if 'github.com' in h else ''}>{T(sidemenu.two(ja), sidemenu.two(en))}</a></li>' for h, ja, en in MENU[1:]) + '</ul></section>'
             +
             f'<section><h2>{T("テーマ", "Theme")}</h2><div class="seg theme" role="group" aria-label="テーマ / Theme">'
             '<button type="button" data-theme-set="auto" aria-pressed="true" title="自動 / Auto" aria-label="自動 / Auto"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>'
@@ -1275,7 +1275,7 @@ def build(db):
             f'<meta property="og:title" content="Cryptoole — 未解決暗号のオープン検索エンジン"><meta property="og:description" content="Cryptiana・cyphersolver・CryptoCellar・DECODE・cipher-readings の未解決暗号を一元的に検索。状況・種類・言語・地域・年代で横断して絞り込める。">'
             f'<meta property="og:image" content="{sidemenu.SEARCH_URL}og.png?v={int((H / 'og.png').stat().st_mtime) if (H / 'og.png').exists() else 0}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Cryptoole — 未解決暗号のオープン検索エンジン">'
             f'<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Cryptoole — 未解決暗号のオープン検索エンジン"><meta name="twitter:description" content="未解決の歴史的暗号を一元的に検索できるエンジン。"><meta name="twitter:image" content="{sidemenu.SEARCH_URL}og.png?v={int((H / 'og.png').stat().st_mtime) if (H / 'og.png').exists() else 0}">\n'
-            f'<style>{CSS}{sidemenu.LOGO_CSS}{sidemenu.GH_CSS}{sidemenu.SPIN_CSS}</style></head><body><main>\n{BAR}\n{body}\n</main>\n<script>(function(){{{LANGJS}{sidemenu.SE_JS}{js}}})();</script></body></html>\n')
+            f'<style>{CSS}{sidemenu.LOGO_CSS}{sidemenu.GH_CSS}{sidemenu.SPIN_CSS}{sidemenu.SUB_CSS}</style></head><body><main>\n{BAR}\n{body}\n</main>\n<script>(function(){{{LANGJS}{sidemenu.SE_JS}{js}}})();</script></body></html>\n')
     page = page.replace('href="/crypt/', 'href="https://satoru.net/crypt/')   # served from cryptoole.satoru.net: links back to satoru.net are absolute
     (H / 'index.html').write_text(page, encoding='utf-8')
     (H / 'udb.py.txt').write_text(Path(__file__).read_text(encoding='utf-8'), encoding='utf-8')
