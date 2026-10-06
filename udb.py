@@ -977,7 +977,7 @@ def build(db):
             '.side .upd dd .lcd{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap;padding:5px 10px;border-radius:3px;font:16px/1.2 DotLCD,ui-monospace,monospace;letter-spacing:.06em;color:#2b3324;'
             'background:#b9c2a0 repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0 1px,transparent 1px 2px);border:2px solid #8e977a;box-shadow:inset 0 1px 4px rgba(0,0,0,.28)}'
             '.side .upd dd .lz{font-size:11px;opacity:.8}'
-            '.side .upd{align-items:center}.side .upd dt{white-space:nowrap}'
+            '.side .upd{align-items:start;grid-template-columns:1fr!important;gap:6px!important}.side .upd dt{white-space:nowrap}'
             '.side ul{margin:0;padding-left:1.1em;font-size:14px;line-height:1.65}.side ul.srcl{list-style:none;padding:0;margin:0 0 8px}.side .srcl li{margin:6px 0}.side li{margin:4px 0}.side .upd{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:10px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px}.side .upd dt{color:var(--muted);font-weight:600}.side .upd dd{margin:0;font-variant-numeric:tabular-nums}.side .lead{font-size:14px;line-height:1.7;margin:0 0 8px}.side .note{font-size:13.5px;line-height:1.7;margin:0}'
             '.also{font-size:13.5px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)}.also .m{font-size:12px}'
             '.lead .t[lang=ja]{word-break:keep-all;word-break:auto-phrase;overflow-wrap:anywhere;line-break:strict}'
