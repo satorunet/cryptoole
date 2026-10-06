@@ -7,10 +7,11 @@ sys.path.insert(0, str(H))
 import sidemenu
 
 TABS = [('top', '概要', 'Overview'), ('time', '解読の推移', 'Solves over time'), ('who', '解読者ランキング', 'Decipherers'), ('src', '出典別', 'By source'), ('age', '年代別', 'By period'), ('ctry', '国別', 'By country')]
-TABJS = ("var tb=document.querySelectorAll('.stabs [data-tab]'),tp=document.querySelectorAll('.tp');"
+TABJS = ("function mvi(sb){var i=document.querySelector('.stabs .sind');if(!i||!sb)return;i.style.width=sb.offsetWidth+'px';i.style.transform='translateX('+sb.offsetLeft+'px)';}"
+         "var tb=document.querySelectorAll('.stabs [data-tab]'),tp=document.querySelectorAll('.tp');"
          "function show(k,push){var ok=false;tb.forEach(function(b){var on=b.dataset.tab===k;b.setAttribute('aria-selected',String(on));if(on)ok=true;});if(!ok)return;"
-         "tp.forEach(function(p){p.hidden=p.dataset.tab!==k;if(!p.hidden)p.querySelectorAll('.cw').forEach(function(c){c.scrollLeft=c.scrollWidth;});});var bar=document.querySelector('.stabs'),sb=bar.querySelector('[aria-selected=\"true\"]');if(sb){var l=sb.offsetLeft-bar.offsetLeft,r=l+sb.offsetWidth;if(l<bar.scrollLeft)bar.scrollLeft=l-8;else if(r>bar.scrollLeft+bar.clientWidth)bar.scrollLeft=r-bar.clientWidth+8;}if(push){try{history.replaceState(null,'','#'+k);}catch(e){}}}"
-         "var bar=document.querySelector('.stabs'),pin=document.getElementById('stabs-pin');function hdr(){var h=document.querySelector('header');return h?Math.round(h.getBoundingClientRect().bottom):0;}function fit(){bar.style.top=hdr()+'px';}fit();addEventListener('resize',fit);tb.forEach(function(b){b.addEventListener('click',function(){var hh=hdr(),stuck=pin.getBoundingClientRect().top<hh;show(b.dataset.tab,true);if(stuck)scrollTo(0,pin.getBoundingClientRect().top+scrollY-hh);});});"
+         "tp.forEach(function(p){p.hidden=p.dataset.tab!==k;if(!p.hidden)p.querySelectorAll('.cw').forEach(function(c){c.scrollLeft=c.scrollWidth;});});var bar=document.querySelector('.stabs'),sb=bar.querySelector('[aria-selected=\"true\"]');mvi(sb);if(sb){var l=sb.offsetLeft-bar.offsetLeft,r=l+sb.offsetWidth;if(l<bar.scrollLeft)bar.scrollLeft=l-8;else if(r>bar.scrollLeft+bar.clientWidth)bar.scrollLeft=r-bar.clientWidth+8;}if(push){try{history.replaceState(null,'','#'+k);}catch(e){}}}"
+         "var bar=document.querySelector('.stabs'),pin=document.getElementById('stabs-pin');function hdr(){var h=document.querySelector('header');return h?Math.round(h.getBoundingClientRect().bottom):0;}function fit(){bar.style.top=hdr()+'px';mvi(bar.querySelector('[aria-selected=\"true\"]'));}fit();addEventListener('resize',fit);if(document.fonts)document.fonts.ready.then(fit);setTimeout(function(){bar.classList.add('anim');},50);tb.forEach(function(b){b.addEventListener('click',function(){var hh=hdr(),stuck=pin.getBoundingClientRect().top<hh;show(b.dataset.tab,true);if(stuck)scrollTo(0,pin.getBoundingClientRect().top+scrollY-hh);});});"
          "show((location.hash||'').slice(1)||tb[0].dataset.tab,false);window.addEventListener('hashchange',function(){show(location.hash.slice(1),false);});")
 TOPC = {'solved': '#2e7d4f', 'open': '#a3161b', 'na': '#7a7468'}
 TOPL = {'solved': ('解読済', 'Solved'), 'open': ('未解読', 'Unsolved'), 'na': ('不明', 'Unknown')}
@@ -145,7 +146,7 @@ def write(CSS, head, BAR, LANGJS, T, menu_links, recs, SRC, MARK, COUNTRY):
                + stack([(T(*cn[k]), by_k[k]) for k in top] + [(T('不明', 'unknown'), by_k['xx'])], '9em') + '</section>')
 
     body = (f'<p class="crumb"><a href="./" id="back">{T("検索へ戻る", "Back to search")}</a></p><h1>{T("未解読暗号の解読状況統計", "Decipherment statistics of unsolved ciphers")}</h1>'
-            + '<div id="stabs-pin"></div><div class="stabs" role="tablist" aria-label="統計 / Statistics">' + ''.join(f'<button type="button" role="tab" data-tab="{k}" aria-selected="false">{T(ja, en)}</button>' for k, ja, en in TABS if sec[k]) + '</div>'
+            + '<div id="stabs-pin"></div><div class="stabs" role="tablist" aria-label="統計 / Statistics">' + ''.join(f'<button type="button" role="tab" data-tab="{k}" aria-selected="false">{T(ja, en)}</button>' for k, ja, en in TABS if sec[k]) + '<span class="sind" aria-hidden="true"></span></div>'
             + ''.join(f'<div class="tp" id="tp-{k}" role="tabpanel" data-tab="{k}"{"" if i == 0 else " hidden"}>' + ''.join(sec[k]) + '</div>' for i, (k, ja, en) in enumerate(t for t in TABS if sec[t[0]]))
             + f'<p class="note upd">{T("集計日", "Counted")} {datetime.date.today().isoformat()}</p>')
     css = CSS + sidemenu.CSS + sidemenu.LOGO_CSS + (
@@ -171,7 +172,9 @@ def write(CSS, head, BAR, LANGJS, T, menu_links, recs, SRC, MARK, COUNTRY):
         '.rk{display:inline-block;min-width:1.8em;margin-right:4px;font:700 12px system-ui,sans-serif;color:var(--muted);text-align:right}.rk.md{min-width:0;width:20px;height:20px;line-height:20px;border-radius:50%;text-align:center;color:#fff;margin-right:6px;margin-left:calc(1.8em - 20px);font-size:11px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.15)}.rk.m1{background:linear-gradient(145deg,#f3d36b,#c79a1e)}.rk.m2{background:linear-gradient(145deg,#e3e5e8,#9a9ea6)}.rk.m3{background:linear-gradient(145deg,#e1a774,#a8642e)}.rl .d{font:12.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted)}.rl .who{color:var(--muted);font-size:13px}.upd{margin-top:24px}'
         '.tp{min-height:calc(100vh - 110px)}.stabs{position:sticky;top:49px;z-index:5;background:var(--bg);display:flex;gap:0;margin:6px 0 14px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}.stabs::-webkit-scrollbar{display:none}'
         '.stabs button{flex:none;font:inherit;font-size:14px;border:0;background:none;color:var(--muted);padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}'
-        '.stabs button:hover{color:var(--ink)}.stabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}.tp>section:first-child h2{border-top:0;margin-top:14px}')
+        '.stabs button:hover{color:var(--ink)}.stabs button[aria-selected="true"]{color:var(--ink);font-weight:600}'
+        '.stabs .sind{position:absolute;left:0;bottom:0;height:3px;width:0;border-radius:3px 3px 0 0;background:var(--accent);pointer-events:none}.stabs.anim .sind{transition:transform .32s cubic-bezier(.2,.8,.2,1),width .32s cubic-bezier(.2,.8,.2,1)}@media (prefers-reduced-motion:reduce){.stabs.anim .sind{transition:none}}'
+        '.tp>section:first-child h2{border-top:0;margin-top:14px}')
     bar = sidemenu.cbar(BAR, T)
     page = (f'{head}{sidemenu.EARLY}{sidemenu.ICON}<title>未解読暗号の解読状況統計 — Cryptoole</title><meta name="author" content="satorunet">'
             f'<link rel="canonical" href="{sidemenu.SEARCH_URL}stats.html">\n<style>{css}</style></head><body><main class="st">\n{bar}\n{body}\n'
