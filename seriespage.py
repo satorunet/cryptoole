@@ -82,7 +82,7 @@ def write(CSS, head, BAR, LANGJS, js, CJ, MJ, SIJ, T, menu_links):
         "function fin(){box.querySelectorAll('a[href^=\"http\"]').forEach(function(a){if(a.hostname!==location.hostname){a.target='_blank';a.rel='noopener external';a.classList.add('ext');}});"
         "var bk=document.getElementById('back');if(!bk)return;bk.addEventListener('click',function(ev){try{if(document.referrer&&new URL(document.referrer).origin===location.origin&&history.length>1){ev.preventDefault();history.back();}}catch(e){}});}"
         "if(!id){box.innerHTML='<p>'+T('暗号が指定されていません。','No case given.')+' <a href=\"./\">Cryptoole</a></p>';}"
-        "else fetch('c/'+id.replace(/[^A-Za-z0-9]+/g,'-')+'.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(x){render(x);})"
+        "else fetch('c/'+id.replace(/[^A-Za-z0-9]+/g,'-')+'.json?v='+BV).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(x){render(x);})"
         ".catch(function(){box.innerHTML='<p>'+T('この暗号は見つかりませんでした。','This case was not found.')+' <a href=\"./\">Cryptoole</a></p>';});"
         "var tipOn=null;document.addEventListener('click',function(ev){var a=ev.target.closest('.sn');if(a&&matchMedia('(hover: none)').matches&&tipOn!==a){ev.preventDefault();if(tipOn)tipOn.classList.remove('tip');a.classList.add('tip');tipOn=a;return;}if(tipOn&&!a){tipOn.classList.remove('tip');tipOn=null;}});")
     css = CSS + sidemenu.CSS + sidemenu.SPIN_CSS + (

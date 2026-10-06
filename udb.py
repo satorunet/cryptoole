@@ -1156,7 +1156,7 @@ def build(db):
           "+(x.o||[]).map(function(o){return '<div class=\"also\">'+mark(o[0])+'<a href=\"'+esc(o[1])+'\">'+T(esc(o[2]),esc(o[3]))+'</a></div>';}).join('')"
           "+(x.mn?''"
           "+'<details class=\"grpd\" data-id=\"'+esc(x.i)+'\"><summary>'+(x.mk==='vol'?T('同じ巻・シリーズの記録 ほか '+x.mn+' 件','+ '+x.mn+' more records in this series'):x.mk==='same'?T('関連する記録 ほか '+x.mn+' 件','+ '+x.mn+' related records'):T('同じ題名の記録 ほか '+x.mn+' 件','+ '+x.mn+' more records with this title'))+(x.pc?pbar(x.pc):'')+'</summary><div class=\"qv\">…</div></details>':'')+'</div></li>';}"
-          "function sfile(id){return 'c/'+id.replace(/[^A-Za-z0-9]+/g,'-')+'.json';}"
+          "function sfile(id){return 'c/'+id.replace(/[^A-Za-z0-9]+/g,'-')+'.json?v='+BV;}"
           "function pbar(c){if(!c[0]&&!c[1])return '';var n=c[0]+c[1]+c[2],K=['solved','open','na'],pc=function(v){var r=v*100/n;return r>0&&r<1?'<1%':r>99&&r<100?'>99%':Math.round(r)+'%';};return ' <span class=\"pbw\">'+(c.filter(function(v){return v;}).length>1?'<span class=\"pbar\" aria-hidden=\"true\">'+K.map(function(k,i){return c[i]?'<i style=\"width:'+(c[i]*100/n)+'%;background:'+CAT[k][2]+'\"></i>':'';}).join('')+'</span>':'')+'<span class=\"pct\">'+[[c[0],T('解決 ','solved ')],[c[1],T('未解決 ','unsolved ')],[c[2],T('不明 ','unknown ')]].filter(function(z){return z[0];}).map(function(z){return z[1]+pc(z[0]);}).join(' · ')+'</span></span>';}"
           "function quick(x){return x.mk==='vol'&&x.nm?series(x):'<ul>'+x.m.map(function(m){var sc=m[6].split(':')[0];return '<li>'+badge(m[5])+(MK[sc]?mark(sc):'')+'<a href=\"'+esc(m[0])+'\">'+esc(sc==='decode'?m[6].replace('decode:','R'):(m[7]||m[6]))+'</a> '+T(esc(m[1]),esc(m[2]))+(m[3]&&m[3]!==x.mj?' · '+T(esc(m[3]),esc(m[4])):'')+'</li>';}).join('')+'</ul>';}"
           "ul.addEventListener('toggle',function(ev){var d=ev.target;if(!d.classList||!d.classList.contains('grpd')||!d.open||d.dataset.ok)return;d.dataset.ok=1;"
@@ -1190,7 +1190,7 @@ def build(db):
           "+'<span class=\"hl\">'+T('検索結果','Results')+'</span><b>'+total.toLocaleString()+'</b><span class=\"hu\">'+T('件',total===1?'match':'matches')+'</span>'"
           "+'<span class=\"ht\">'+T('全 '+D.length.toLocaleString()+' 件中','of '+D.length.toLocaleString())+'</span>';var hb=hn.querySelector('b');if(hb){hb.dataset.v=window.__hc||0;cup(hb,total);window.__hc=total;}"
           "var ac=document.getElementById('advcount');if(ac)ac.textContent=total+' / '+D.length;}"
-          "fetch('idx.json').then(function(r){return r.json();}).then(function(d){D=d;D.forEach(function(x){x._t=(x.tj+' '+x.te+' '+x.mj+' '+x.me+' '+(x.n||'')+' '+x.i+' '+(x.g||'')+' '+(x.ms||'')).toLowerCase();delete x.ms;});run();})"
+          "fetch('idx.json?v='+BV).then(function(r){return r.json();}).then(function(d){D=d;D.forEach(function(x){x._t=(x.tj+' '+x.te+' '+x.mj+' '+x.me+' '+(x.n||'')+' '+x.i+' '+(x.g||'')+' '+(x.ms||'')).toLowerCase();delete x.ms;});run();})"
           ".catch(function(){ul.removeAttribute('aria-busy');ul.innerHTML='<li>'+T('読み込めませんでした。','Could not load the index.')+'</li>';});"
           "more.addEventListener('click',function(){run(true);});"
           "var fn=document.getElementById('fnav'),fu=fn.querySelector('[data-go=top]'),fd=fn.querySelector('[data-go=bottom]'),ft=0;"
@@ -1250,6 +1250,7 @@ def build(db):
     MENUB = (f'<button type="button" class="menub" id="menubtn" aria-haspopup="dialog" aria-label="メニュー / Menu" title="このデータベースについて / About"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>')
     BAR = sidemenu.cbar(BAR, T)
     head += "<script>try{var th=localStorage.getItem('crypt-theme');if(th==='light'||th==='dark')document.documentElement.dataset.theme=th;else if(th!=='auto')document.documentElement.dataset.theme='light';}catch(e){}</script>"
+    head += f"<script>var BV='{datetime.datetime.now():%Y%m%d%H%M%S}';</script>"   # build version: data files are fetched with ?v=BV so a new build is never read from the browser cache
     page = (f'{head}{sidemenu.ICON}<title>Cryptoole — 未解決暗号のオープン検索エンジン / open search for unsolved ciphers</title><meta name="author" content="satorunet">'
             f'<meta name="description" content="Cryptiana・cyphersolver・CryptoCellar・DECODE・cipher-readings の未解決暗号を一元的に検索。状況・種類・言語・地域・年代で横断して絞り込める。"><link rel="canonical" href="{sidemenu.SEARCH_URL}">'
             f'<meta property="og:type" content="website"><meta property="og:site_name" content="Cryptoole"><meta property="og:url" content="{sidemenu.SEARCH_URL}">'
