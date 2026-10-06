@@ -958,8 +958,8 @@ def build(db):
             '.sname{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.sname img{border-radius:3px}.sname .mk{margin-right:0}'
             '.menub{flex:none;margin-left:4px;display:inline-flex;align-items:center;justify-content:center;width:36px;height:34px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;cursor:pointer}.menub:hover{border-color:var(--accent);color:var(--accent)}'
             '.side{position:fixed;inset:0 0 0 auto;margin:0;max-width:none;max-height:none;height:100vh;height:100dvh;width:min(330px,78vw);border:0;border-left:1px solid var(--line);border-radius:16px 0 0 16px;background:var(--paper);color:var(--ink);padding:0;overflow-y:auto;box-shadow:-12px 0 40px rgba(0,0,0,.22)}'
-            '.side[open]{animation:sidein .22s cubic-bezier(.2,.8,.2,1)}@keyframes sidein{from{transform:translateX(100%)}to{transform:none}}'
-            '@media (prefers-reduced-motion:reduce){.side[open]{animation:none}}'
+            '.side[open]{animation:sidein .22s cubic-bezier(.2,.8,.2,1)}@keyframes sidein{from{transform:translateX(100%)}to{transform:none}}.side.closing{animation:sideout .21s cubic-bezier(.4,0,1,1) forwards}@keyframes sideout{from{transform:none}to{transform:translateX(100%)}}.side.closing::backdrop{opacity:0;transition:opacity .21s}'
+            '@media (prefers-reduced-motion:reduce){.side[open],.side.closing{animation:none}}'
             '.side::backdrop{background:rgba(0,0,0,.3);backdrop-filter:blur(2px)}'
             '.side .advh{position:sticky;top:0;z-index:1;background:var(--paper);padding:14px 18px 10px;border-bottom:1px solid var(--line);margin:0}'
             '.side .advh b{font:700 16px/1.3 Georgia,"Noto Serif JP",serif}'
@@ -1254,7 +1254,7 @@ def build(db):
           "var tb=document.querySelectorAll('[data-theme-set]');function th(v,save){var r=document.documentElement;if(v==='auto')delete r.dataset.theme;else r.dataset.theme=v;tb.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.themeSet===v));});if(save){try{localStorage.setItem('crypt-theme',v);}catch(e){}}}"
           "th(document.documentElement.dataset.theme||'auto',false);tb.forEach(function(b){b.addEventListener('click',function(){th(b.dataset.themeSet,true);});});"
           "var sd=document.getElementById('side');document.getElementById('menubtn').addEventListener('click',function(){window.cse(1568,1568,.035,'square',.05);if(sd.showModal)sd.showModal();else sd.setAttribute('open','');});"
-          "function sc(){if(sd.close)sd.close();else sd.removeAttribute('open');}document.getElementById('sideclose').addEventListener('click',sc);"
+          "function sc(){if(sd.classList.contains('closing'))return;sd.classList.add('closing');setTimeout(function(){sd.classList.remove('closing');if(sd.close)sd.close();else sd.removeAttribute('open');},210);}sd.addEventListener('cancel',function(ev){ev.preventDefault();sc();});document.getElementById('sideclose').addEventListener('click',sc);"
           "sd.addEventListener('click',function(ev){if(ev.target!==sd)return;var r=sd.getBoundingClientRect();if(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom)sc();});"
           "var dlg=document.getElementById('adv');document.getElementById('advbtn').addEventListener('click',function(){if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','');});"
           "function cl(){if(dlg.close)dlg.close();else dlg.removeAttribute('open');}document.getElementById('advclose').addEventListener('click',cl);document.getElementById('advok').addEventListener('click',cl);"
