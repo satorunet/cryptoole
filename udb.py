@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS same(
   PRIMARY KEY(src, key));
 CREATE TABLE IF NOT EXISTS same_note(grp TEXT PRIMARY KEY, note TEXT NOT NULL, checked TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS same_auto(src TEXT NOT NULL, key TEXT NOT NULL, rid TEXT NOT NULL, PRIMARY KEY(src, key, rid));
+CREATE TABLE IF NOT EXISTS bw_note(src TEXT NOT NULL, key TEXT NOT NULL, slug TEXT NOT NULL, checked TEXT NOT NULL, PRIMARY KEY(src, key, slug));
 '''
 SRC = {'cryptiana': ('Cryptiana（友清氏）', 'Cryptiana (Tomokiyo)', 'https://cryptiana.web.fc2.com/code/unsolved.htm'),
        'cyphersolver': ('cyphersolver（Bourdeau）', 'cyphersolver (Bourdeau)', 'https://dbourdeau.github.io/cyphersolver/catalogue.html'),
@@ -149,6 +150,26 @@ def cryptiana():
         yield dict(key=x['title'], title_en=x['title'], grp=x['group'], date_text=dp.group(1) if dp else '', year=int(sd[:4]) if sd else None, sortdate=sd,
                    cat=x['cat'], status_src=x['status'] or 'Unsolved', url=x['url'], slug=slug_for(x['title']),
                    solved_on=so, solved_by=who)
+
+# Bourdeau write-ups related to an entry: the links Tomokiyo himself puts under an item, plus pairs checked by hand (table bw_note)
+def bw_links(db):
+    u = (C / 'tomokiyo/source-unsolved.htm.log').read_bytes().decode('shift_jis', errors='replace')
+    tx = lambda x: ' '.join(html.unescape(re.sub(r'<[^>]+>', '', x)).split())
+    titles = {q['slug']: q['title'] for q in json.loads((C / 'bourdeau/source-docs_pages.json.log').read_text(encoding='utf-8'))}
+    def lab(url):
+        m = re.match(r'https://dbourdeau\.github\.io/cyphersolver/([\w.-]+)\.html', url)
+        if m: return titles.get(m.group(1), m.group(1))
+        m = re.search(r'/(?:blob|tree)/main/(.+?)(?:/NOTES\.md)?$', url)
+        return ('notes: ' + m.group(1)) if m else 'repository'
+    out = {}
+    for m in re.finditer(r'<H3[^>]*>(.*?)</H3>(.*?)(?=<H3|<H2|</BODY|$)', u, re.S | re.I):
+        key = tx(re.sub(r'<font[^>]*>.*?</font>', '', m.group(1), flags=re.S | re.I))
+        for url in dict.fromkeys(re.findall(r'href="(https?://(?:dbourdeau\.github\.io/cyphersolver/[\w.-]+\.html|github\.com/dbourdeau/cyphersolver/(?:blob|tree)/[^"#]+))"', m.group(2), re.I)):
+            out.setdefault(('cryptiana', key), []).append([url, lab(url)])
+    for s, k, slug in db.execute('SELECT src, key, slug FROM bw_note ORDER BY rowid'):
+        url = f'https://dbourdeau.github.io/cyphersolver/{slug}.html'
+        if all(x[0] != url for x in out.get((s, k), [])): out.setdefault((s, k), []).append([url, lab(url)])
+    return out
 
 # cyphersolver entries link to their own write-up page (docs/<slug>.html), else to their expanded row in the catalogue (#e<id>). Hand-matched where the catalogue text names no page (checked 2026-10-05).
 CS_PAGE = {183: 'dinteville1592', 214: 'hellen1752', 223: 'hellen1752', 87: 'percy1559', 137: 'conley1652',
@@ -877,7 +898,7 @@ def write_static(D):
     for f in sd.glob('*.json'): f.unlink()
     idx = []
     for x in D:
-        y = {k: v for k, v in x.items() if k not in ('m', 'tj0', 'te0', 'A', 'rel', 'sd')}
+        y = {k: v for k, v in x.items() if k not in ('m', 'tj0', 'te0', 'A', 'rel', 'sd', 'bw')}
         y['ms'] = ' '.join([x['pid'], x['cr'], x.get('cs', ''), x['i'].replace('decode:', 'R') if x['i'].startswith('decode:') else ''] + [m[6].replace('decode:', 'R') + ' ' + m[9] + ' ' + m[10] + ' ' + m[11] for m in x.get('m', [])] + x.get('A', {}).get('pe', []) + ([x['sb']] if x.get('sb') else [])).strip()   # people are searchable too (the case page links names here)   # unified IDs, member R-numbers and names stay searchable
         if x.get('m'): y['mn'] = len(x['m'])
         pg = x.get('pg', 0) if x.get('mk') == 'same' else x.get('pg', 0) + sum(m[12] for m in x.get('m', []) if len(m) > 12)   # total pages of the row
@@ -1033,9 +1054,12 @@ def build(db):
         if r['src_created'] or r['src_updated'] or r['changed_on']: x['sd'] = [[r['src'], r['src_created'], r['src_updated'], r['src_scope'], r['changed_on']]]
         return x
     NAMES = decode_names(db)
+    BW = bw_links(db)
     D = []
     for r in rs:
         x = mkx(r)
+        bw = [z for o in [r] + r['others'] for z in BW.get((o['src'], o['key']), [])]
+        if bw: x['bw'] = [z for i, z in enumerate(bw) if all(z[0] != y[0] for y in bw[:i])]
         if r['others']:   # the same cipher in other sources: bundled like a series (one row, members listed in m)
             ox = [mkx(o) for o in r['others']]
             x['m'] = [[o['u'], o['dj'], o['de'], o['mj'], o['me'], o['c'], o['i'], o['tj'], o['te'], NAMES.get(o['i'], '')] for o in ox]
@@ -1051,7 +1075,12 @@ def build(db):
                 x['mj'] = best['mj'].split(' · ')[0] + ' · ' + x['mj'] if best['mj'].startswith(('解決', '一部解決')) else x['mj']
                 x['me'] = best['me'].split(' · ')[0] + ' · ' + x['me'] if best['me'].startswith(('Solved', 'Partly')) else x['me']
         D.append(x)
+    BWI = {x['i']: x['bw'] for x in D if x.get('bw')}
     D = group_decode(D, NAMES, {f'{r["src"]}:{r["key"]}': r['shelfmark'] for r in rs})
+    for x in D:   # a series shows the write-ups of its records too
+        if x.get('m'):
+            bw = x.get('bw', []) + [z for mm in x['m'] for z in BWI.get(mm[6], [])]
+            if bw: x['bw'] = [z for i, z in enumerate(bw) if all(z[0] != y[0] for y in bw[:i])]
     # the record type is shown as an icon, not as a "鍵：/Key:" prefix in the title
     untype = lambda s, ja: (lambda u: ('（不明）' if ja else '(unknown)') if u in ('', '...', '…') else u)(re.sub(r'^(鍵：|Key: )', '', s or '').strip())
     for x in D:
@@ -1262,6 +1291,11 @@ def main():
             db.execute('INSERT OR REPLACE INTO same VALUES(?,?,?,?)', (g, i, s, k))
         db.execute('INSERT OR REPLACE INTO same_note VALUES(?,?,?)', (g, note, datetime.date.today().isoformat()))
         db.commit(); print('ok', g, len(mems))
+    elif cmd == 'bw':   # udb.py bw SRC KEY SLUG [SLUG...]: Bourdeau write-ups checked by hand as related to an entry
+        s, k = sys.argv[2], sys.argv[3]
+        if not db.execute('SELECT 1 FROM entries WHERE src=? AND key=?', (s, k)).fetchone(): sys.exit(f'no entry {s}:{k}')
+        for slug in sys.argv[4:]: db.execute('INSERT OR REPLACE INTO bw_note VALUES(?,?,?,?)', (s, k, slug, datetime.date.today().isoformat()))
+        db.commit(); print('ok', s, k, len(sys.argv) - 4)
     elif cmd == 'build':
         build(db)
     else:

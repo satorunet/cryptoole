@@ -69,6 +69,7 @@ def write(CSS, head, BAR, LANGJS, js, CJ, MJ, SIJ, T, menu_links):
         "+(x.n?'<dt>'+T('背景','Context')+'</dt><dd><span class=\"t\" lang=\"ja\">'+esc(x.n)+'</span><span class=\"t\" lang=\"en\">—</span></dd>':'')+attrs(x)+'</dl>'"
         "+'<section class=\"exs\"><h2>'+T('出典・外部リンク','Sources and external links')+'</h2><p class=\"exn\">'+T('以下は外部サイトへのリンクです','These links go to other websites')+'</p><ul class=\"exl\">'"
         "+lk.map(function(l){var sn=SN[l[0]]||[l[0],l[0]];return '<li>'+mark(l[0])+'<span class=\"exsite\">'+T(sn[0],sn[1])+'</span>'+ext(l[1],T(esc(l[2]),esc(l[3])))+'</li>';}).join('')"
+        "+(x.bw||[]).filter(function(w){return !lk.some(function(l){return l[1]===w[0];});}).map(function(w){var sn=SN.cyphersolver;return '<li>'+mark('cyphersolver')+'<span class=\"exsite\">'+T(sn[0],sn[1])+'</span>'+ext(w[0],T('関連する解説：'+esc(w[1]),'Related write-up: '+esc(w[1])))+'</li>';}).join('')"
         "+(x.g?'<li><span class=\"mk sat\">sat</span><span class=\"exsite\">satoru.net</span>'+ext('https://satoru.net/crypt/'+x.g+'/',T('このサイトの解読ページ','decipherment page'))+'</li>':'')"
         "+'</ul>'+(grp&&x.mk!=='same'?'<p class=\"exn\">'+T('各記録の DECODE のページへは、下の構成・一覧から（外部リンク）。','Each record’s DECODE page is linked below (external).')+'</p>':'')+'</section>';"
         "h+=rels(x);if(!grp){box.innerHTML=h;fin();return;}"
