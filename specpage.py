@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """Write /spec.html: the readable page of ID-SPEC.md (the unified format for unsolved ciphers: IDs, series, dates, solutions).
 ID-SPEC.md stays the source; this page is regenerated on every udb.py build."""
 import re, sys
@@ -27,7 +29,7 @@ def write(CSS, head, BAR, LANGJS, T, menu_links):
     bar = sidemenu.cbar(BAR, T)
     page = (f'{head}{sidemenu.EARLY}{sidemenu.ICON}<title>{title} — Cryptoole</title><meta name="author" content="satorunet">'
             f'<link rel="canonical" href="{sidemenu.SEARCH_URL}spec.html">\n<style>{css}</style></head><body><main class="spec">\n{bar}\n{body}\n'
-            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/ID-SPEC.md">ID-SPEC.md</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a></footer>\n{sidemenu.drawer(T, menu_links)}\n</main>\n'
+            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/ID-SPEC.md">ID-SPEC.md</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/LICENSE">MIT License</a></footer>\n{sidemenu.drawer(T, menu_links)}\n</main>\n'
             f'<script>(function(){{{LANGJS}{sidemenu.JS}}})();</script></body></html>\n')
     page = page.replace('href="/crypt/', 'href="https://satoru.net/crypt/')
     (H / 'spec.html').write_text(page, encoding='utf-8')

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """Write /stats.html: counts compared by number solved — solvers, solve dates (year, month, cumulative), sources, centuries,
 decades and countries. Counted per record (a series counts each record in it); regenerated on every udb.py build."""
 import collections, datetime, re, sys
@@ -181,7 +183,7 @@ def write(CSS, head, BAR, LANGJS, T, menu_links, recs, SRC, MARK, COUNTRY):
     bar = sidemenu.cbar(BAR, T)
     page = (f'{head}{sidemenu.EARLY}{sidemenu.ICON}<title>未解読暗号の解読状況統計 — Cryptoole</title><meta name="author" content="satorunet">'
             f'<link rel="canonical" href="{sidemenu.SEARCH_URL}stats.html">\n<style>{css}</style></head><body><main class="st">\n{bar}\n{body}\n'
-            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a></footer>\n{sidemenu.drawer(T, menu_links)}\n</main>\n'
+            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/LICENSE">MIT License</a></footer>\n{sidemenu.drawer(T, menu_links)}\n</main>\n'
             f'<script>(function(){{{LANGJS}{sidemenu.JS}{TABJS}}})();</script></body></html>\n')
     page = page.replace('href="/crypt/', 'href="https://satoru.net/crypt/')
     (H / 'stats.html').write_text(page, encoding='utf-8')

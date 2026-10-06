@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """Shared side menu (☰ drawer with theme switch and links) for /crypt/ pages built by Python scripts.
 Extracted from unsolved/udb.py's page on 2026-10-05; keep the look in step with it.
   from sidemenu import CSS, MENUB, EARLY, JS, drawer

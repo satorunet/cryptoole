@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 # 未解決暗号データベースの検索 API（serve.sqlite を読むだけ。udb.py build が作る）
 # 例: api.cgi?status=open&source=decode&language=fr&q=dinteville&sort=date&offset=0&limit=100
 # 仕様: api.html（誰でも自由に使える。キー不要、CORS 許可）

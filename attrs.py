@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """Attributes (country, languages, cipher system, symbols, people, keywords) and relations between cases.
 Used by udb.py build. Automatic values come from the sources; hand-made ones from data/attributes.csv and data/relations.csv.
 See ID-SPEC.md, chapters "属性" and "関連"."""

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """Write /case.html: the detail page of one case (every row of the search list has one; grouped rows show their series),
 and /series.html, a redirect kept for old links.
 The search list links each grouped row here (series.html?id=<row id>); the page asks api.cgi?id=… for that row.
@@ -143,7 +145,7 @@ def write(CSS, head, BAR, LANGJS, js, CJ, MJ, SIJ, T, menu_links):
     bar = sidemenu.cbar(BAR, T)
     page = (f'{head}{sidemenu.EARLY}{sidemenu.ICON}<title>Cryptoole</title><meta name="author" content="satorunet"><meta name="robots" content="noindex">\n'
             f'<style>{css}</style></head><body><main>\n{bar}\n<div id="sp"><p class="loading" role="status"><span class="t" lang="ja">読み込み中…</span><span class="t" lang="en">Loading…</span></p></div>\n'
-            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a href="api.html">API</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a></footer>\n{menu}\n</main>\n'
+            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a href="api.html">API</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/LICENSE">MIT License</a></footer>\n{menu}\n</main>\n'
             f'<script>(function(){{{LANGJS}{sidemenu.JS}{page_js}}})();</script></body></html>\n')
     page = page.replace('href="/crypt/', 'href="https://satoru.net/crypt/')
     (H / 'case.html').write_text(page, encoding='utf-8')

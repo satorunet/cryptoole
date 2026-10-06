@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """Render og.png (1200x630) for the Twitter/OGP card of the Cryptoole top page, with headless Chromium (Python playwright).
 Run after udb.py build when the counts change:  python3 ogimage.py"""
 import asyncio, json

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """Fetch DECODE (de-crypt.org) records through its public JSON API into unsolved.sqlite.
 
   python3 decode_fetch.py list            the whole record list (one request) -> table decode_list

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 satoru.net. MIT License (see LICENSE): https://github.com/satorunet/cryptoole
+# SPDX-License-Identifier: MIT
 """/crypt/unsolved/ : a Japanese database of unsolved historical ciphers, merged from public lists.
 
 Sources (re-imported on every `import`; Japanese text is kept in its own table and survives):
@@ -1154,7 +1156,7 @@ def build(db):
             '<button type="button" data-theme-set="light" aria-pressed="false" title="ライト / Light" aria-label="ライト / Light"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>'
             '<button type="button" data-theme-set="dark" aria-pressed="false" title="ダーク / Dark" aria-label="ダーク / Dark"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button></div></section>'
             '</dialog>'
-            f'<footer>satorunet · <a href="/crypt/">crypt</a> · <a href="/crypt/timeline/">{T("未解読暗号系サイトの更新状況", "Updates on unsolved-cipher sites")}</a> · <a href="api.html">API</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a></footer>')
+            f'<footer>satorunet · <a href="/crypt/">crypt</a> · <a href="api.html">API</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/LICENSE">MIT License</a></footer>')
     SIJ = json.dumps({k: SICON[TOP.get(k, k)].replace('width="18" height="18"', 'width="11" height="11"') for k in list(CAT) + ['all']}, ensure_ascii=False)
     CJ = json.dumps({k: [v[0], v[1], v[2]] for k, v in CAT.items()}, ensure_ascii=False)
     MJ = json.dumps({k: [m, c, SRC[k][2], SRC[k][0], SRC[k][1]] for k, (m, c) in MARK.items()}, ensure_ascii=False)
