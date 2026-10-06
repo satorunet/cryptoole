@@ -116,6 +116,8 @@ def write(CSS, head, BAR, LANGJS, T, menu_links, recs, SRC, MARK, COUNTRY):
         for d in sorted(r['solved'].replace('-00', '-01') for r in sol):
             cum += 1; pts.append((d, cum))
         sec['time'].append(f'<section><h2>{T("解読数の累計", "Solves over time (cumulative)")}</h2>' + line(pts) + '</section>')
+    k0 = sec['top'][0].find('<p class="note">')   # the overview's notes go below its lists
+    if k0 > 0: sec['top'] = [sec['top'][0][:k0]] + sec['top'][1:] + [sec['top'][0][k0:]]
     # 3. solvers
     sv = collections.Counter(nm for r in recs if r['top'] in ('solved', 'open') for nm in r['solvers'])
     if sv:
