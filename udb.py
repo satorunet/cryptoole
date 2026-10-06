@@ -521,12 +521,6 @@ def honor(names):
     return '・'.join(f'{x}氏' if re.search(r'[\u3040-\u30ff\u4e00-\u9fff]', x) else x for x in ps)
 
 JST = datetime.timezone(datetime.timedelta(hours=9), 'JST')
-def lcd(d):
-    """The last-fetch time on a small dot-matrix LCD, like an electronic dictionary's screen."""
-    try: x = datetime.datetime.fromisoformat(d).astimezone(JST)
-    except Exception: return html.escape(d or '')
-    return f'<span class="lcd" role="img" aria-label="{x:%Y-%m-%d %H:%M} JST">{x:%Y/%m/%d}&nbsp;{x:%H:%M}<span class="lz">JST</span></span>'
-
 def fmt_when_iso(d, en=False):
     """'2026-10-05' -> '2026年10月5日' / '5 Oct 2026'; '2026-10-06T12:40+09:00' -> '2026年10月6日 12:40（日本時間）' / '6 Oct 2026, 12:40 JST'."""
     if 'T' in (d or ''):
@@ -963,7 +957,7 @@ def build(db):
             '.badge .q{display:inline-block;margin:-1px -8px -1px 6px;padding:1px 8px 1px 6px;border-radius:0 999px 999px 0;background:rgba(255,255,255,.3);font-weight:500}.badge .q-key{background:#4f7fbd}'
             '.sname{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.sname img{border-radius:3px}.sname .mk{margin-right:0}'
             '.menub{flex:none;margin-left:4px;display:inline-flex;align-items:center;justify-content:center;width:36px;height:34px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;cursor:pointer}.menub:hover{border-color:var(--accent);color:var(--accent)}'
-            '.side{position:fixed;inset:0 0 0 auto;margin:0;max-width:none;max-height:none;height:100vh;height:100dvh;width:min(400px,88vw);border:0;border-left:1px solid var(--line);border-radius:16px 0 0 16px;background:var(--paper);color:var(--ink);padding:0;overflow-y:auto;box-shadow:-12px 0 40px rgba(0,0,0,.22)}'
+            '.side{position:fixed;inset:0 0 0 auto;margin:0;max-width:none;max-height:none;height:100vh;height:100dvh;width:min(330px,78vw);border:0;border-left:1px solid var(--line);border-radius:16px 0 0 16px;background:var(--paper);color:var(--ink);padding:0;overflow-y:auto;box-shadow:-12px 0 40px rgba(0,0,0,.22)}'
             '.side[open]{animation:sidein .22s cubic-bezier(.2,.8,.2,1)}@keyframes sidein{from{transform:translateX(100%)}to{transform:none}}'
             '@media (prefers-reduced-motion:reduce){.side[open]{animation:none}}'
             '.side::backdrop{background:rgba(0,0,0,.3);backdrop-filter:blur(2px)}'
@@ -973,12 +967,7 @@ def build(db):
             '.side .acc{border-bottom:1px solid var(--line)}.side .acc summary{cursor:pointer;padding:10px 2px;list-style:none;display:flex;justify-content:space-between;align-items:center}.side .acc summary::-webkit-details-marker{display:none}.side .acc summary::after{content:"▾";color:var(--muted);transition:transform .15s}.side .acc[open] summary::after{transform:rotate(180deg)}.side .accb{padding:0 2px 12px}'
             '.side .navl{list-style:none;padding:0;margin:0}.side .navl li{margin:0;border-bottom:1px solid var(--line)}.side .navl a{display:block;padding:10px 2px;text-decoration:none;color:var(--ink)}.side .navl a:hover{color:var(--accent)}.side .seg.theme{margin:4px 0 6px}.seg.theme button{padding:7px 14px}'
             '.side .srcl .xs{flex:none;display:inline-flex;width:26px;height:26px;border-radius:6px;align-items:center;justify-content:center}.side .srcl .xs::before{content:"";width:13px;height:13px;background:var(--muted);-webkit-mask:url(ext.svg) center/contain no-repeat;mask:url(ext.svg) center/contain no-repeat}.side .srcl .xs:hover{background:var(--accent-soft)}.side .srcl .xs:hover::before{background:var(--accent)}.side .srcl li{display:flex;align-items:center;gap:6px}.side .srcl .mk{flex:none}.side .srcl a{flex:1;min-width:0;text-align:left}.cntp{flex:none;min-width:2.2em;text-align:center;font:600 11.5px/18px system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--accent-soft);border:1px solid var(--line);border-radius:999px;padding:0 7px}'
-            '@font-face{font-family:DotLCD;src:url(fonts/DotGothic16-sub.woff2) format("woff2");font-display:swap}'
-            '.side .upd dd .lcd{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap;padding:5px 10px;border-radius:3px;font:16px/1.2 DotLCD,ui-monospace,monospace;letter-spacing:.06em;color:#2b3324;'
-            'background:#b9c2a0 repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0 1px,transparent 1px 2px);border:2px solid #8e977a;box-shadow:inset 0 1px 4px rgba(0,0,0,.28)}'
-            '.side .upd dd .lz{font-size:11px;opacity:.8}'
-            '.side .upd{align-items:start;grid-template-columns:1fr!important;gap:6px!important}.side .upd dt{white-space:nowrap}'
-            '.side ul{margin:0;padding-left:1.1em;font-size:14px;line-height:1.65}.side ul.srcl{list-style:none;padding:0;margin:0 0 8px}.side .srcl li{margin:6px 0}.side li{margin:4px 0}.side .upd{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:10px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px}.side .upd dt{color:var(--muted);font-weight:600}.side .upd dd{margin:0;font-variant-numeric:tabular-nums}.side .lead{font-size:14px;line-height:1.7;margin:0 0 8px}.side .note{font-size:13.5px;line-height:1.7;margin:0}'
+                        '.side ul{margin:0;padding-left:1.1em;font-size:14px;line-height:1.65}.side ul.srcl{list-style:none;padding:0;margin:0 0 8px}.side .srcl li{margin:6px 0}.side li{margin:4px 0}.side .upd{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:10px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px}.side .upd dt{color:var(--muted);font-weight:600}.side .upd dd{margin:0;font-variant-numeric:tabular-nums}.side .lead{font-size:14px;line-height:1.7;margin:0 0 8px}.side .note{font-size:13.5px;line-height:1.7;margin:0}'
             '.also{font-size:13.5px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)}.also .m{font-size:12px}'
             '.lead .t[lang=ja]{word-break:keep-all;word-break:auto-phrase;overflow-wrap:anywhere;line-break:strict}'
             '#ul mark{background:#ffe066;color:#1f1d1a;font-weight:700;border-radius:3px;padding:0 2px;box-shadow:0 0 0 1px #e0b400}'
@@ -1158,7 +1147,7 @@ def build(db):
             '</ul></div></details>'
             f'<details class="acc" open id="sources"><summary>{T("出典と取得について", "Sources and data")}</summary><div class="accb">'
             + srcs +
-            f'<dl class="upd"><dt>{T("最終取得", "Last fetched")}</dt><dd>{lcd(upd)}</dd></dl>'
+            f'<dl class="upd"><dt>{T("最終取得", "Last fetched")}</dt><dd>{T(fmt_when_iso(upd), fmt_when_iso(upd, True))}</dd></dl>'
             '</div></details>'
             '<ul class="navl">' + ''.join(f'<li><a href="{h}"{' class="gh"' if 'github.com' in h else ''}>{T(ja, en)}</a></li>' for h, ja, en in MENU[1:]) + '</ul></section>'
             +
