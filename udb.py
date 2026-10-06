@@ -101,6 +101,8 @@ M='January|February|March|April|May|June|July|August|September|October|November|
 ACT=r'\b(?:solved|deciphered|decrypted|broken|broke|cracked|notified me of (?:his|her|their) (?:full )?solution|published (?:his|her|their|a|the)? ?(?:full )?(?:solution|decipherment)|provided me with|solution (?:by|was)|was solved|found the key|finding the key|results were published|[Ss]olution of .{0,220}? was published|reads this)\b'
 NEG=r'\b(?:undeciphered|unsolved|remains?|appears?|seems?|not been|yet to)\b'
 def solved_info(body, by=''):
+    m=re.search(r'Decipherments? (?:was|were|has been|have been) published by .+? by ('+M+r') (\d{4})\.(?=\s|$)',body)   # "... published by X, Y and Z by October 2026."
+    if m: return f'{m.group(1)} {m.group(2)}',m.group(0)
     sents=re.split(r'(?<!\s[A-Z]\.)(?<=[.!?])\s+',body)   # not after an initial ("Lawren M. Smithline")
     good=[s for s in sents if re.search(ACT,s,re.I) and not re.search(NEG,s,re.I)]
     for s in good:
