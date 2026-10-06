@@ -926,6 +926,7 @@ def build(db):
             '.side section{padding:4px 18px 10px}.side h2{font:700 13px system-ui,sans-serif;letter-spacing:.04em;color:var(--muted);margin:14px 0 6px;border:0;padding:0}'
             '.side .acc{border-bottom:1px solid var(--line)}.side .acc summary{cursor:pointer;padding:10px 2px;list-style:none;display:flex;justify-content:space-between;align-items:center}.side .acc summary::-webkit-details-marker{display:none}.side .acc summary::after{content:"▾";color:var(--muted);transition:transform .15s}.side .acc[open] summary::after{transform:rotate(180deg)}.side .accb{padding:0 2px 12px}'
             '.side .navl{list-style:none;padding:0;margin:0}.side .navl li{margin:0;border-bottom:1px solid var(--line)}.side .navl a{display:block;padding:10px 2px;text-decoration:none;color:var(--ink)}.side .navl a:hover{color:var(--accent)}.side .seg.theme{margin:4px 0 6px}.seg.theme button{padding:7px 14px}'
+            '.side .srcl li{display:flex;align-items:center;gap:6px}.side .srcl .mk{flex:none}.side .srcl a{flex:1;min-width:0;text-align:left}.cntp{flex:none;min-width:2.2em;text-align:center;font:600 11.5px/18px system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--accent-soft);border:1px solid var(--line);border-radius:999px;padding:0 7px}'
             '.side ul{margin:0;padding-left:1.1em;font-size:14px;line-height:1.65}.side ul.srcl{list-style:none;padding:0;margin:0 0 8px}.side .srcl li{margin:6px 0}.side li{margin:4px 0}.side .upd{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:10px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px}.side .upd dt{color:var(--muted);font-weight:600}.side .upd dd{margin:0;font-variant-numeric:tabular-nums}.side .lead{font-size:14px;line-height:1.7;margin:0 0 8px}.side .note{font-size:13.5px;line-height:1.7;margin:0}'
             '.also{font-size:13.5px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)}.also .m{font-size:12px}'
             '.lead .t[lang=ja]{word-break:keep-all;word-break:auto-phrase;overflow-wrap:anywhere;line-break:strict}'
@@ -1065,8 +1066,10 @@ def build(db):
     for r in rs: r['cat'] = keep[f"{r['src']}:{r['key']}"]['c']
     n = len(rs)
     cnt = lambda col, v: sum(1 for r in rs if (v in r['srcs'] if col == 'src' else r[col] == v))
+    T_plain = lambda n: f'{n:,} 件 / {n:,} entries'
     chips = selects(rs)
-    srcs = '<ul class="srcl">' + ''.join(f'<li>{mark(k, icon=False)} <a href="{e(v[2])}">{T(*v[:2])}</a></li>' for k, v in SRC.items()) + '</ul>'
+    # each source links to the search filtered by it, with the number of rows it appears in
+    srcs = '<ul class="srcl">' + ''.join(f'<li>{mark(k, link=False, icon=False)}<a href="./?source={k}" title="{e(v[0])} / {e(v[1])}">{T(*v[:2])}</a><span class="cntp" title="{T_plain(cnt("src", k))}">{cnt("src", k):,}</span></li>' for k, v in SRC.items()) + '</ul>'
     upd = max((r['last_seen'] for r in rs), default='')
     m = db.execute("SELECT v FROM meta WHERE k='last_fetch'").fetchone() if db.execute("SELECT 1 FROM sqlite_master WHERE name='meta'").fetchone() else None
     if m: upd = m[0]   # the time of the last fetch, not just the day
