@@ -160,14 +160,14 @@ CS00001  ASFi（Archivio di Stato di Firenze）          level=repository
 | 列 | 内容 |
 |---|---|
 | `pid` | `P` + 4桁 |
-| `name` | 本人が使う表記（原語のまま。例 `Daniel Bourdeau`、`友清理士`、ハンドル `satorunet`） |
+| `name` | 本人が使う表記（原語のまま。例 `Daniel Bourdeau`、`S. Tomokiyo`、ハンドル `satorunet`） |
 | `name_latin` | ラテン文字表記（例 `Satoshi Tomokiyo`） |
 | `sort_name` | 並べ替え用（姓, 名） |
 | `kind` | `person`／`team`／`org`／`handle` |
 | `url` | 本人のサイトなど |
 
 - 出典の書き方の揺れ（`Satoru`／`satorunet`）は `person_alias` で寄せる。
-- **表示の敬称**：日本語の画面では、日本語で書く名前にだけ「氏」を付ける（友清氏）。ラテン文字の名前とハンドルには付けない（Bourdeau、satorunet）。英語の画面では付けない。
+- **表示の敬称**：日本語の画面では、日本語で書く名前にだけ「氏」を付ける。ラテン文字の名前とハンドルには付けない（Bourdeau、satorunet）。英語の画面では付けない。
 - 複数人は出典の順に並べ、日本語は「・」、英語は「, 」と最後だけ「 and 」でつなぐ。
 - AI は解決者にしない（`tools` に書く）。表示は「解決：2026年10月1日・satorunet（Claude Opus 5.5 を使用）」。
 
