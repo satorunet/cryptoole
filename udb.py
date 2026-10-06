@@ -49,7 +49,7 @@ SRC = {'cryptiana': ('Cryptiana（友清氏）', 'Cryptiana (Tomokiyo)', 'https:
        'rosson': ('cipher-readings（Rosson）', 'cipher-readings (Rosson)', 'https://github.com/pangoleen/cipher-readings')}
 TABL = {'all': ('全て', 'All'), 'open': ('未解読', 'Unsolved'), 'solved': ('解読済', 'Solved'), 'na': ('不明', 'Unknown')}   # tiny labels under the status tabs
 CAT = {'open': ('未解決', 'unsolved', '#a3161b'), 'part': ('一部', 'partly', '#b7791f'),
-       'key': ('鍵のみ', 'key only', '#3b6fb0'), 'solved': ('解決', 'solved', '#2e7d4f'), 'na': ('不明', 'unknown', '#7a7468')}
+       'key': ('鍵のみ', 'key only', '#3b6fb0'), 'solved': ('解決', 'solved', '#2e7d4f'), 'na': ('状況不明', 'status unknown', '#7a7468')}
 TOP = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'na': 'na'}   # shown as two classes; part/key become a qualifier on 未解決
 def badge(cat):
     top = TOP[cat]
