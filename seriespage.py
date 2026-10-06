@@ -140,7 +140,7 @@ def write(CSS, head, BAR, LANGJS, js, CJ, MJ, SIJ, T, menu_links):
     bar = sidemenu.cbar(BAR, T)
     page = (f'{head}{sidemenu.EARLY}{sidemenu.ICON}<title>Cryptoole</title><meta name="author" content="satorunet"><meta name="robots" content="noindex">\n'
             f'<style>{css}</style></head><body><main>\n{bar}\n<div id="sp"><p>…</p></div>\n'
-            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a href="api.html">API</a></footer>\n{menu}\n</main>\n'
+            f'<footer>satorunet · <a href="./">Cryptoole</a> · <a href="api.html">API</a> · <a href="https://github.com/satorunet/cryptoole">GitHub</a></footer>\n{menu}\n</main>\n'
             f'<script>(function(){{{LANGJS}{sidemenu.JS}{page_js}}})();</script></body></html>\n')
     page = page.replace('href="/crypt/', 'href="https://satoru.net/crypt/')
     (H / 'case.html').write_text(page, encoding='utf-8')

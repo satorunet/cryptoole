@@ -1,8 +1,8 @@
 # Third-party material
 
-- `ext.svg`, `back.svg`, `google.svg`: icons from Font Awesome Free 6.7.2 by Fonticons, Inc. (https://fontawesome.com),
+- `ext.svg`, `back.svg`, `google.svg`, `github.svg`: icons from Font Awesome Free 6.7.2 by Fonticons, Inc. (https://fontawesome.com),
   licensed under CC BY 4.0 (https://fontawesome.com/license/free). The attribution comment is kept in each file.
-  The Google "G" mark is a trademark of Google LLC; it is used only to label links to a Google search.
+  The Google "G" mark is a trademark of Google LLC and the GitHub mark of GitHub, Inc.; they only label links to those sites.
 
 # Data
 
