@@ -1146,7 +1146,7 @@ def build(db):
             f'<div class="tools qw"><div class="qbox"><div class="conds" id="conds" aria-live="polite"></div><input id="q" type="search" placeholder="検索（題名・所蔵番号・言語）" data-ph-ja="検索（題名・所蔵番号・言語）" data-ph-en="Search (title, shelfmark, language)" aria-label="検索 / Search" autocomplete="off"><button type="button" id="qx" class="qx" aria-label="検索語を消す / Clear search" title="検索語を消す / Clear" hidden>×</button></div></div>{chips}'
             f'<ul class="ul" id="ul" aria-busy="true"></ul><div class="nohit" id="nohit" hidden><p>{T("該当する暗号は見つかりませんでした。", "No ciphers match.")}</p><p class="nh2">{T("検索語を減らすか、条件を外してみてください。", "Try fewer words or remove a condition.")}</p><button type="button" class="fs-reset" id="nhclear">{T("条件をクリア", "Clear all")}</button></div><div class="morew"><button type="button" class="more" id="more" hidden>{T("さらに表示", "Show more")}</button></div>'
             # side menu (drawer) with the explanation and the sources
-            f'<dialog class="side" id="side" aria-label="メニュー / Menu"><div class="advh"><b>{T("メニュー", "Menu")}</b><button type="button" class="advx" id="sideclose" aria-label="閉じる / Close">×</button></div>'
+            f'<dialog class="side" id="side" aria-label="メニュー / Menu"><div class="advh"><b>{T("メニュー", "Menu")}</b>' + sidemenu.LANGHEAD + f'<button type="button" class="advx" id="sideclose" aria-label="閉じる / Close">×</button></div>'
             f'<section><h2>{T("情報", "Info")}</h2>'
             f'<details class="acc"><summary>{T("このデータベースについて", "About this database")}</summary><div class="accb">'
             f'<p class="lead">{T(f"{SN} の<wbr>暗号の<wbr>一覧を<wbr>一元的に<wbr>管理。<wbr>状況・<wbr>種類・<wbr>言語・<wbr>地域・<wbr>年代で<wbr>横断して<wbr>絞り込める", f"The {SN_EN} lists of unsolved ciphers managed in one place, filterable across sources by status, language, region and date")}</p>'
@@ -1161,7 +1161,7 @@ def build(db):
             f'<dl class="upd"><dt>{T("最終取得", "Last fetched")}</dt><dd>{lcd(upd)}</dd></dl>'
             '</div></details>'
             '<ul class="navl">' + ''.join(f'<li><a href="{h}"{' class="gh"' if 'github.com' in h else ''}>{T(ja, en)}</a></li>' for h, ja, en in MENU[1:]) + '</ul></section>'
-            + sidemenu.LANGSEC +
+            +
             f'<section><h2>{T("テーマ", "Theme")}</h2><div class="seg theme" role="group" aria-label="テーマ / Theme">'
             '<button type="button" data-theme-set="auto" aria-pressed="true" title="自動 / Auto" aria-label="自動 / Auto"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>'
             '<button type="button" data-theme-set="light" aria-pressed="false" title="ライト / Light" aria-label="ライト / Light"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>'
