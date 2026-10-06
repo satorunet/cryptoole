@@ -460,10 +460,8 @@ MENU = [('./', 'Cryptoole（未解決暗号のオープン検索）', 'Cryptoole
         ('/crypt/timeline/', '各サイトの更新情報（時系列）', 'Updates from each site (timeline)'),
         ('spec.html', '未解決暗号の統一フォーマット（仕様案）', 'Unified format for unsolved ciphers (draft)'),
         ('https://github.com/satorunet/cryptoole', 'ソースコード（GitHub）', 'Source code (GitHub)'), ('/crypt/', 'crypt トップ', 'crypt home')]
-SORTS = [('date', ('暗号の年代：古い順', 'Cipher date: oldest first')), ('date-desc', ('暗号の年代：新しい順', 'Cipher date: newest first')),
-         ('solved', ('解決日：新しい順', 'Solved: newest first')), ('solved-asc', ('解決日：古い順', 'Solved: oldest first')),
-         ('added', ('追加日：新しい順', 'Added: newest first')), ('size', ('シリーズの件数：多い順', 'Series size: largest first')),
-         ('pages', ('総頁数：多い順', 'Total pages: most first'))]
+SORTS = [('date', ('暗号の年代', 'Cipher date')), ('solved', ('解決日', 'Solved date')), ('added', ('追加日', 'Date added')),
+         ('size', ('シリーズの件数', 'Series size')), ('pages', ('総頁数', 'Total pages'))]   # each with its own default direction (DIRDEF in the page script)
 def solved_key(s):
     """'19 September 2026' -> '2026-09-19', 'March 2021' -> '2021-03-00', '2023' -> '2023-00-00'."""
     m = re.match(r'(?:(\d{1,2}) )?([A-Za-z]+)\.? (\d{4})$', s)
@@ -616,7 +614,9 @@ def selects(rs):
                '<path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg><span id="sortlab"></span></button>'
                '<div class="sortm" id="sortm" role="menu" hidden>'
                + ''.join(f'<button type="button" role="menuitemradio" data-sort="{k}" aria-checked="false" data-ja="{e(ja)}" data-en="{e(en)}">{T(e(ja), e(en))}</button>' for k, (ja, en) in SORTS)
-               + '</div></div>')
+               + '</div></div>'
+               '<button type="button" class="fs-dir" id="sortdir" title="並び順の向き / Direction" aria-label="並び順の向きを切り替える / Reverse the order">'
+               '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>')
     
     out.append(f'<button type="button" class="fs-reset" id="reset">{T("条件をクリア", "Clear")}</button>')
     # advanced search opens as a floating window (<dialog>)
@@ -965,6 +965,7 @@ def build(db):
             '.advb.on{background:var(--accent-soft);border-color:var(--accent)}.fs select.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}.fs-sort.on{border-color:var(--accent);color:var(--accent)}'
             '.sortw{position:relative}.fs-sort{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;cursor:pointer;font:inherit;font-size:13px}.fs-sort:hover{border-color:var(--accent);color:var(--accent)}'
             '.sortm{position:absolute;z-index:30;top:calc(100% + 4px);left:0;min-width:15em;background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px;display:flex;flex-direction:column}'
+            '.fs-dir{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;cursor:pointer;margin-left:-2px}.fs-dir:hover{background:var(--accent-soft)}.fs-dir svg{transition:transform .25s}.fs-dir.up svg{transform:rotate(180deg)}'
             '.sortm button{font:inherit;font-size:14px;text-align:left;border:0;background:none;color:var(--ink);padding:8px 10px 8px 26px;border-radius:7px;cursor:pointer;position:relative}'
             '.sortm button:hover{background:var(--accent-soft)}.sortm button[aria-checked="true"]::before{content:"✓";position:absolute;left:9px;color:var(--accent)}'
             '.fnav{position:fixed;right:12px;top:55%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:10px}.fnav button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 92%,transparent);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}.fnav button:hover,.fnav button:focus-visible,.fnav button:active{opacity:1;background:var(--accent-soft);color:var(--accent)}.fnav button{opacity:.55;transform:scale(1);transition:opacity .4s ease,transform .4s ease,visibility 0s linear 0s}.fnav button[hidden]{display:flex!important;visibility:hidden;opacity:0;transform:scale(.8);pointer-events:none;transition:opacity .4s ease,transform .4s ease,visibility 0s linear .4s}@media (prefers-reduced-motion:reduce){.fnav button,.fnav button[hidden]{transition:none}}'
@@ -1110,7 +1111,7 @@ def build(db):
     CJ = json.dumps({k: [v[0], v[1], v[2]] for k, v in CAT.items()}, ensure_ascii=False)
     MJ = json.dumps({k: [m, c, SRC[k][2], SRC[k][0], SRC[k][1]] for k, (m, c) in MARK.items()}, ensure_ascii=False)
     js = ("var q=document.getElementById('q'),ul=document.getElementById('ul'),more=document.getElementById('more'),"
-          "PAGE=100,f={cat:'all',src:'all',type:'all',lang:'all',reg:'all',cen:'all',ctry:'all',sys:'all'},ADV=['src','type','lang','reg','cen','ctry','sys'],DEF='solved',mode=DEF,P={cat:'status',src:'source',type:'type',lang:'language',reg:'region',cen:'century',ctry:'country',sys:'system'};"
+          "PAGE=100,f={cat:'all',src:'all',type:'all',lang:'all',reg:'all',cen:'all',ctry:'all',sys:'all'},ADV=['src','type','lang','reg','cen','ctry','sys'],DEF='solved',DIRDEF={date:'asc',solved:'desc',added:'desc',size:'desc',pages:'desc'},mode=DEF,dir=DIRDEF[DEF],P={cat:'status',src:'source',type:'type',lang:'language',reg:'region',cen:'century',ctry:'country',sys:'system'};"
           "var CAT=" + CJ + ",TOP={open:'open',part:'open',key:'open',solved:'solved',na:'na'},MK=" + MJ + ",SI=" + SIJ + ";"
           "function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c];});}"
           "function T(a,b){return '<span class=\"t\" lang=\"ja\">'+a+'</span><span class=\"t\" lang=\"en\">'+b+'</span>';}"
@@ -1150,8 +1151,8 @@ def build(db):
           "for(var i=0;i<w.length;i++)if(x._t.indexOf(w[i])<0)return false;return true;}"
           "function run(keep){advn();if(window.save)save();if(window.conds)conds();if(!D)return;var off=keep?ul.children.length:0;"
           "if(!keep){var w=q.value.trim().toLowerCase().split(/\\s+/).filter(Boolean).slice(0,8);"
-          "var fld={date:'k','date-desc':'k',solved:'s','solved-asc':'s',added:'a',size:'k'}[mode],up=(mode==='date'||mode==='solved-asc');"
-          "hits=D.filter(function(x){return ok(x,w);});if(mode==='pages')hits.sort(function(a,b){return ((b.pg||0)-(a.pg||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else if(mode==='size')hits.sort(function(a,b){return ((b.mn||0)-(a.mn||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else hits.sort(function(a,b){var x=a[fld]||'',y=b[fld]||'';if(x===y)return a.k<b.k?-1:(a.k>b.k?1:(a.i<b.i?-1:1));if(!x)return 1;if(!y)return -1;return up?(x<y?-1:1):(x<y?1:-1);});total=hits.length;}"
+          "var fld={date:'k',solved:'s',added:'a'}[mode]||'k',up=dir==='asc',sg=up?-1:1;"
+          "hits=D.filter(function(x){return ok(x,w);});if(mode==='pages')hits.sort(function(a,b){if(!a.pg!==!b.pg)return a.pg?-1:1;return sg*((b.pg||0)-(a.pg||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else if(mode==='size')hits.sort(function(a,b){return sg*((b.mn||0)-(a.mn||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else hits.sort(function(a,b){var x=a[fld]||'',y=b[fld]||'';if(x===y)return a.k<b.k?-1:(a.k>b.k?1:(a.i<b.i?-1:1));if(!x)return 1;if(!y)return -1;return up?(x<y?-1:1):(x<y?1:-1);});total=hits.length;}"
           "var page=hits.slice(off,off+(off?PAGE*2:PAGE)),h=page.map(row).join('');if(keep)ul.insertAdjacentHTML('beforeend',h);else ul.innerHTML=h;for(var z=off;z<ul.children.length;z++)hl(ul.children[z]);"
           "ul.removeAttribute('aria-busy');more.hidden=ul.children.length>=total;document.getElementById('nohit').hidden=total>0;var hn=document.getElementById('hitn'),act=q.value.trim()||f.cat!=='all'||ADV.some(function(g){return f[g]!=='all';});hn.hidden=!act||!total;if(act)hn.innerHTML='<svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m15.5 15.5 5 5\"/></svg>'"
           "+'<span class=\"hl\">'+T('検索結果','Results')+'</span><b>'+total.toLocaleString()+'</b><span class=\"hu\">'+T('件',total===1?'match':'matches')+'</span>'"
@@ -1176,9 +1177,9 @@ def build(db):
           "sg.forEach(function(b){b.addEventListener('click',function(ev){if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.button)return;ev.preventDefault();seg(b.dataset.cat);run();});});"
           "window.save=null;"
           "function save(){var u=new URLSearchParams(location.search);['q','sort'].concat(Object.keys(P).map(function(k){return P[k];})).forEach(function(k){u.delete(k);});"
-          "var v=q.value.trim();if(v)u.set('q',v);Object.keys(P).forEach(function(k){if(k==='cat'){if(f.cat!=='all')u.set('status',f.cat);}else if(f[k]!=='all')u.set(P[k],f[k]);});if(mode!==DEF)u.set('sort',mode);"
+          "var v=q.value.trim();if(v)u.set('q',v);Object.keys(P).forEach(function(k){if(k==='cat'){if(f.cat!=='all')u.set('status',f.cat);}else if(f[k]!=='all')u.set(P[k],f[k]);});u.delete('dir');if(mode!==DEF)u.set('sort',mode);if(dir!==DIRDEF[mode])u.set('dir',dir);"
           "var s=u.toString().replace(/%2C/gi,',');try{history.replaceState(null,'',location.pathname+(s?'?'+s:'')+location.hash);}catch(e){}}window.save=save;"
-          "(function(){var u=new URLSearchParams(location.search);if(u.get('q'))q.value=u.get('q');var sv=u.get('sort');if(sv==='desc')sv='date-desc';if(sv&&document.querySelector('.sortm [data-sort=\"'+sv+'\"]'))mode=sv;"
+          "(function(){var u=new URLSearchParams(location.search);if(u.get('q'))q.value=u.get('q');var sv=u.get('sort'),dv=u.get('dir');var OLD={'desc':['date','desc'],'date-desc':['date','desc'],'solved-asc':['solved','asc']};if(OLD[sv]){dv=dv||OLD[sv][1];sv=OLD[sv][0];}if(sv&&DIRDEF[sv])mode=sv;dir=(dv==='asc'||dv==='desc')?dv:DIRDEF[mode];"
           "Object.keys(P).forEach(function(k){var v=u.get(P[k]);if(!v)return;if(v==='*')v='all';if(k==='cat'){if(v.indexOf(',')>=0)f.cat=v;else if(document.querySelector('.seg [data-cat=\"'+v+'\"]'))seg(v);return;}if(v.indexOf(',')>=0){f[k]=v;return;}"
           "var s=document.querySelector('select[data-g=\"'+k+'\"]');if(s&&s.querySelector('option[value=\"'+v+'\"]')){s.value=v;f[k]=v;}});seg(f.cat);})();"
           "var LBL={q:['検索','Search'],cat:['状況','Status'],src:['出典','Source'],type:['種類','Type'],ctry:['国','Country'],sys:['方式','System'],lang:['言語','Language'],reg:['地域','Region'],cen:['世紀','Century'],sort:['並び順','Order']};"
@@ -1189,17 +1190,17 @@ def build(db):
           "function lbl(sel,v){return String(v).split(',').map(function(z){var e=document.querySelector(sel.replace('#',z));return e?(e.tagName==='OPTION'?e.textContent.replace(/[（(]\\d+[）)]$/,''):txt(e).replace(/\\s*\\d+$/,'')):z;}).join('・');}"
           "if(f.cat!=='all')chip('cat',lbl('.seg [data-cat=\"#\"]',f.cat));"
           "ADV.forEach(function(g){var s=document.querySelector('select[data-g=\"'+g+'\"]');s.classList.toggle('on',f[g]!=='all');if(f[g]!=='all')chip(g,lbl('select[data-g=\"'+g+'\"] option[value=\"#\"]',f[g]));});"
-          "if(mode!==DEF){var b=document.querySelector('.sortm [data-sort=\"'+mode+'\"]');chip('sort',b.dataset[l?'en':'ja']);}"
-          "so.classList.toggle('on',mode!==DEF);document.getElementById('advbtn').classList.toggle('on',ADV.some(function(g){return f[g]!=='all';}));"
+          "if(mode!==DEF||dir!==DIRDEF[mode])chip('sort',slab(l?'en':'ja'));"
+          "document.getElementById('advbtn').classList.toggle('on',ADV.some(function(g){return f[g]!=='all';}));"
           "box.innerHTML=h.join('');box.querySelectorAll('.cond b').forEach(function(b,i){b.textContent=vals[i];});"
           "box.querySelectorAll('[data-x]').forEach(function(x){x.addEventListener('click',function(){var k=x.dataset.x;"
-          "if(k==='q'){q.value='';qxs();}else if(k==='cat')seg('all');else if(k==='sort'){mode=DEF;sl();}else{var s=document.querySelector('select[data-g=\"'+k+'\"]');s.value='all';f[k]='all';}run();});});};"
+          "if(k==='q'){q.value='';qxs();}else if(k==='cat')seg('all');else if(k==='sort'){mode=DEF;dir=DIRDEF[DEF];sl();}else{var s=document.querySelector('select[data-g=\"'+k+'\"]');s.value='all';f[k]='all';}run();});});};"
           "var sm=document.getElementById('sortm'),sb=document.querySelectorAll('.sortm [data-sort]');"
-          "function sl(){var l=document.documentElement.dataset.ui==='en'?'en':'ja';sb.forEach(function(b){var on=b.dataset.sort===mode;b.setAttribute('aria-checked',String(on));if(on){document.getElementById('sortlab').textContent=b.dataset[l];so.title=b.dataset[l];}});}"
+          "function dlab(l){var n=mode==='size'||mode==='pages';return dir==='asc'?(n?(l==='en'?'fewest first':'少ない順'):(l==='en'?'oldest first':'古い順')):(n?(l==='en'?'most first':'多い順'):(l==='en'?'newest first':'新しい順'));}function slab(l){var b=document.querySelector('.sortm [data-sort=\"'+mode+'\"]');return (b?b.dataset[l]:mode)+(l==='en'?': ':'：')+dlab(l);}function sl(){var l=document.documentElement.dataset.ui==='en'?'en':'ja';sb.forEach(function(b){b.setAttribute('aria-checked',String(b.dataset.sort===mode));});var t=slab(l);document.getElementById('sortlab').textContent=t;so.title=t;var sd=document.getElementById('sortdir');sd.classList.toggle('up',dir==='asc');sd.title=(l==='en'?'Reverse: now ':'向きを切り替え（今は')+dlab(l)+(l==='en'?'':'）');so.classList.toggle('on',mode!==DEF||dir!==DIRDEF[mode]);}"
           "function sm_(o){sm.hidden=!o;so.setAttribute('aria-expanded',String(o));}"
           "so.addEventListener('click',function(ev){ev.stopPropagation();sm_(sm.hidden);});"
-          "sb.forEach(function(b){b.addEventListener('click',function(){mode=b.dataset.sort;sm_(false);sl();run();});});"
-          "document.addEventListener('click',function(ev){if(!sm.hidden&&!sm.contains(ev.target))sm_(false);});document.addEventListener('keydown',function(ev){if(ev.key==='Escape')sm_(false);});"
+          "sb.forEach(function(b){b.addEventListener('click',function(){mode=b.dataset.sort;dir=DIRDEF[mode];sm_(false);sl();run();});});"
+          "document.addEventListener('click',function(ev){if(!sm.hidden&&!sm.contains(ev.target))sm_(false);});document.getElementById('sortdir').addEventListener('click',function(){dir=dir==='asc'?'desc':'asc';sl();run();});document.addEventListener('keydown',function(ev){if(ev.key==='Escape')sm_(false);});"
           "var tb=document.querySelectorAll('[data-theme-set]');function th(v,save){var r=document.documentElement;if(v==='auto')delete r.dataset.theme;else r.dataset.theme=v;tb.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.themeSet===v));});if(save){try{localStorage.setItem('crypt-theme',v);}catch(e){}}}"
           "th(document.documentElement.dataset.theme||'auto',false);tb.forEach(function(b){b.addEventListener('click',function(){th(b.dataset.themeSet,true);});});"
           "var sd=document.getElementById('side');document.getElementById('menubtn').addEventListener('click',function(){if(sd.showModal)sd.showModal();else sd.setAttribute('open','');});"
