@@ -609,14 +609,14 @@ def selects(rs):
         out.append(f'<label class="fs"><span>{T(lj, le)}</span><select data-g="{g}">' + o('all', 'すべて', 'All')
                    + ''.join(o(k, f'{ja}（{c}）', f'{en} ({c})') for k, (ja, en), c in items if c) + '</select></label>')
     # one-tap order toggle: the icon shows the current order (oldest at top = arrow down the years)
-    sortb = ('<button type="button" class="fs-dir" id="sortdir" title="並び順の向き / Direction" aria-label="並び順の向きを切り替える / Reverse the order">'
-               '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'
-               '<div class="sortw"><button type="button" class="fs-sort" id="sort" aria-haspopup="menu" aria-expanded="false" title="並び順 / Order">'
+    sortb = ('<div class="sortw"><button type="button" class="fs-sort" id="sort" aria-haspopup="menu" aria-expanded="false" title="並び順 / Order">'
                '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
                '<path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg><span id="sortlab"></span></button>'
                '<div class="sortm" id="sortm" role="menu" hidden>'
                + ''.join(f'<button type="button" role="menuitemradio" data-sort="{k}" aria-checked="false" data-ja="{e(ja)}" data-en="{e(en)}">{T(e(ja), e(en))}</button>' for k, (ja, en) in SORTS)
-               + '</div></div>')
+               + '</div></div>'
+               '<button type="button" class="fs-dir" id="sortdir" title="並び順の向き / Direction" aria-label="並び順の向きを切り替える / Reverse the order">'
+               '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>')
     
     out.append(f'<button type="button" class="fs-reset" id="reset">{T("条件をクリア", "Clear")}</button>')
     # advanced search opens as a floating window (<dialog>)
