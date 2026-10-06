@@ -497,7 +497,7 @@ def fmt_when(s, en=False):
 
 MENU = [('./', 'Cryptoole（未解決暗号のオープン検索）', 'Cryptoole (open search for unsolved ciphers)'), ('stats.html', '未解読暗号の解読状況統計', 'Decipherment statistics'),
         ('/crypt/timeline/', '未解読暗号系サイトの更新状況', 'Updates on unsolved-cipher sites'),
-        ('spec.html', '未解決暗号の統一フォーマット（仕様案）', 'Unified format for unsolved ciphers (draft)'),
+        ('spec.html', 'データフォーマット仕様案', 'Data format (draft)'),
         ('https://github.com/satorunet/cryptoole', 'ソースコード（GitHub）', 'Source code (GitHub)'), ('/crypt/', 'crypt トップ', 'crypt home')]
 SORTS = [('date', ('暗号の年代', 'Cipher date')), ('solved', ('解決日', 'Solved date')), ('added', ('追加日', 'Date added')),
          ('size', ('シリーズの件数', 'Series size')), ('pages', ('総頁数', 'Total pages'))]   # each with its own default direction (DIRDEF in the page script)

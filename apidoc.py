@@ -86,7 +86,7 @@ def write(CSS, head, LANGJS, SRC, LANG, REG, counts, total, updated):
             f'<footer>satorunet · <a href="/crypt/">crypt</a> · <a href="./">Cryptoole</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/api.cgi">api.cgi</a> · <a class="gh" href="https://github.com/satorunet/cryptoole">GitHub</a> · <a href="https://github.com/satorunet/cryptoole/blob/main/LICENSE">MIT License</a></footer>')
     BAR = re.search(r'<header class="bar">.*?</header>', (C / 'timeline/index.html').read_text(encoding='utf-8'), re.S).group(0)
     BAR = sidemenu.cbar(BAR, T)
-    menu = sidemenu.drawer(T, [('./', 'Cryptoole（未解決暗号のオープン検索）', 'Cryptoole (open search for unsolved ciphers)'), ('spec.html', '未解決暗号の統一フォーマット（仕様案）', 'Unified format for unsolved ciphers (draft)'), ('/crypt/', 'crypt トップ', 'crypt home')])
+    menu = sidemenu.drawer(T, [('./', 'Cryptoole（未解決暗号のオープン検索）', 'Cryptoole (open search for unsolved ciphers)'), ('spec.html', 'データフォーマット仕様案', 'Data format (draft)'), ('/crypt/', 'crypt トップ', 'crypt home')])
     css = CSS + sidemenu.CSS + ('pre{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;font-size:13px;line-height:1.55}'
                                 '.grid{overflow-x:auto}.grid table{border-collapse:collapse;width:100%;font-size:14px}.grid th,.grid td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}'
                                 '.grid th{font:600 13px system-ui,sans-serif;color:var(--muted)}h3{font-size:15px;margin:16px 0 6px}section{margin:20px 0}')
