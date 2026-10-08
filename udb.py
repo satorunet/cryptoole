@@ -51,9 +51,9 @@ SRC = {'cryptiana': ('Cryptiana（S. Tomokiyo）', 'Cryptiana (S. Tomokiyo)', 'h
        'cryptocellar': ('CryptoCellar（Weierud）', 'CryptoCellar (Weierud)', 'https://cryptocellar.org/bgac/'),
        'decode': ('DECODE（DECRYPT）', 'DECODE (DECRYPT)', 'https://de-crypt.org/decrypt-web/RecordsList'),
        'rosson': ('cipher-readings（Rosson）', 'cipher-readings (Rosson)', 'https://github.com/pangoleen/cipher-readings')}
-TABL = {'all': ('全て', 'All'), 'open': ('未解読', 'Unsolved'), 'solved': ('解読済', 'Solved'), 'na': ('不明', 'Unknown'), 'ref': ('鍵・資料', 'Keys')}   # tiny labels under the status tabs
+TABL = {'all': ('全て', 'All'), 'open': ('未解読', 'Unsolved'), 'solved': ('解読済', 'Solved'), 'na': ('不明', 'Unclassified'), 'ref': ('鍵・資料', 'Keys')}   # tiny labels under the status tabs
 CAT = {'open': ('未解決', 'unsolved', '#a3161b'), 'part': ('一部', 'partly', '#b7791f'),
-       'key': ('鍵のみ', 'key only', '#3b6fb0'), 'solved': ('解決', 'solved', '#2e7d4f'), 'na': ('状況不明', 'status unknown', '#7a7468'),
+       'key': ('鍵のみ', 'key only', '#3b6fb0'), 'solved': ('解決', 'solved', '#2e7d4f'), 'na': ('分類不明', 'unclassified', '#7a7468'),
        'ref': ('鍵・資料', 'key / reference', '#5b6fb0'),   # DECODE key and manual records: not ciphertexts to solve (2026-10-08)
        'ptx': ('平文あり', 'plaintext attached', '#4f8f63')}   # DECODE status N/A but a plaintext is attached: counted as solved, with this qualifier (user 2026-10-08)
 TOP = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'ptx': 'solved', 'na': 'na', 'ref': 'ref'}   # shown as two classes; part/key become a qualifier on 未解決
@@ -1244,7 +1244,7 @@ def build(db):
           "function chip(k,v,lb){h.push('<span class=\"cond\"><span>'+(lb||LBL[k][l])+'：<b></b></span><button type=\"button\" data-x=\"'+k+'\" aria-label=\"×\">×</button></span>');vals.push(v);}var vals=[];"
           "var qv=q.value.trim();"
           "function lbl(sel,v){return String(v).split(',').map(function(z){var e=document.querySelector(sel.replace('#',z));return e?(e.tagName==='OPTION'?e.textContent.replace(/[（(]\\d+[）)]$/,''):txt(e).replace(/\\s*\\d+$/,'')):z;}).join('・');}"
-          "if(f.cat==='ref')chip('cat',['鍵・資料','keys and references'][l],['区分','Class'][l]);else if(f.cat!=='all')chip('cat',lbl('.seg [data-cat=\"#\"]',f.cat));"
+          "if(f.cat==='ref')chip('cat',['鍵・資料','keys and references'][l],['区分','Class'][l]);else if(f.cat==='na')chip('cat',['不明','unclassified'][l],['分類','Class'][l]);else if(f.cat!=='all')chip('cat',lbl('.seg [data-cat=\"#\"]',f.cat));"
           "ADV.forEach(function(g){var s=document.querySelector('select[data-g=\"'+g+'\"]');s.classList.toggle('on',f[g]!=='all');if(f[g]!=='all')chip(g,lbl('select[data-g=\"'+g+'\"] option[value=\"#\"]',f[g]));});"
           ""
           "document.getElementById('advbtn').classList.toggle('on',ADV.some(function(g){return f[g]!=='all';}));"
