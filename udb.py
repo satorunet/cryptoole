@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS entries(
   title_en TEXT NOT NULL, grp TEXT NOT NULL DEFAULT '',
   date_text TEXT NOT NULL DEFAULT '', year INTEGER, sortdate TEXT NOT NULL DEFAULT '',
   language TEXT NOT NULL DEFAULT '', shelfmark TEXT NOT NULL DEFAULT '',
-  cat TEXT NOT NULL CHECK(cat IN ('open','part','key','solved','na')), status_src TEXT NOT NULL DEFAULT '',
+  cat TEXT NOT NULL CHECK(cat IN ('open','part','key','solved','na','ref')), status_src TEXT NOT NULL DEFAULT '',
   url TEXT NOT NULL, slug TEXT NOT NULL DEFAULT '',
   first_seen TEXT NOT NULL, last_seen TEXT NOT NULL, gone INTEGER NOT NULL DEFAULT 0,
   solved_on TEXT NOT NULL DEFAULT '', solved_by TEXT NOT NULL DEFAULT '', rtype TEXT NOT NULL DEFAULT 'cipher',
@@ -51,10 +51,11 @@ SRC = {'cryptiana': ('Cryptiana（S. Tomokiyo）', 'Cryptiana (S. Tomokiyo)', 'h
        'cryptocellar': ('CryptoCellar（Weierud）', 'CryptoCellar (Weierud)', 'https://cryptocellar.org/bgac/'),
        'decode': ('DECODE（DECRYPT）', 'DECODE (DECRYPT)', 'https://de-crypt.org/decrypt-web/RecordsList'),
        'rosson': ('cipher-readings（Rosson）', 'cipher-readings (Rosson)', 'https://github.com/pangoleen/cipher-readings')}
-TABL = {'all': ('全て', 'All'), 'open': ('未解読', 'Unsolved'), 'solved': ('解読済', 'Solved'), 'na': ('不明', 'Unknown')}   # tiny labels under the status tabs
+TABL = {'all': ('全て', 'All'), 'open': ('未解読', 'Unsolved'), 'solved': ('解読済', 'Solved'), 'na': ('不明', 'Unknown'), 'ref': ('鍵・資料', 'Keys')}   # tiny labels under the status tabs
 CAT = {'open': ('未解決', 'unsolved', '#a3161b'), 'part': ('一部', 'partly', '#b7791f'),
-       'key': ('鍵のみ', 'key only', '#3b6fb0'), 'solved': ('解決', 'solved', '#2e7d4f'), 'na': ('状況不明', 'status unknown', '#7a7468')}
-TOP = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'na': 'na'}   # shown as two classes; part/key become a qualifier on 未解決
+       'key': ('鍵のみ', 'key only', '#3b6fb0'), 'solved': ('解決', 'solved', '#2e7d4f'), 'na': ('状況不明', 'status unknown', '#7a7468'),
+       'ref': ('鍵・資料', 'key / reference', '#5b6fb0')}   # DECODE key and manual records: not ciphertexts to solve (2026-10-08)
+TOP = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'na': 'na', 'ref': 'ref'}   # shown as two classes; part/key become a qualifier on 未解決
 def badge(cat):
     top = TOP[cat]
     q = f'<span class="q q-{cat}">{T(*CAT[cat][:2])}</span>' if cat != top else ''
@@ -67,7 +68,7 @@ MON = {m: i for i, m in enumerate(['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'ju
 def connect():
     db = sqlite3.connect(DB, timeout=120); db.row_factory = sqlite3.Row; db.execute('PRAGMA journal_mode=WAL'); db.executescript(SCHEMA)
     cols = {r[1] for r in db.execute('PRAGMA table_info(entries)')}
-    if "'na'" not in db.execute("SELECT sql FROM sqlite_master WHERE name='entries'").fetchone()[0]:   # widen the status CHECK (2026-10-05)
+    if "'ref'" not in db.execute("SELECT sql FROM sqlite_master WHERE name='entries'").fetchone()[0]:   # widen the status CHECK (2026-10-05 'na', 2026-10-08 'ref')
         old = [r[1] for r in db.execute('PRAGMA table_info(entries)')]
         db.executescript('ALTER TABLE entries RENAME TO entries_old;' + SCHEMA)
         new = [r[1] for r in db.execute('PRAGMA table_info(entries)')]
@@ -256,6 +257,7 @@ def decode(db=None):
         else: dt = tx(L.get('c_cates')).strip(' -')
         lm = re.findall(r'<b>(?:Cleartext|Plaintext):</b>([^<]*)', L.get('c_lang') or '')
         cat, st = DEC_ST.get(L.get('status') or '', ('na', ''))
+        if ty in ('key', 'manual') and cat == 'na': cat, st = 'ref', 'Key / manual (no decryption status)'   # a key is not a cipher to solve (user 2026-10-08)
         yield dict(key=str(i), title_en=t, grp=origin, date_text=dt, year=int(sy) if sy else None, sortdate=sortdate(dt),
                    language=', '.join(x.strip() for x in lm if x.strip()), shelfmark=', '.join(x for x in (city, holder) if x).strip(' ,'),
                    cat=cat, status_src=st or 'N/A', url=f'https://de-crypt.org/decrypt-web/RecordsView/{i}', rtype=ty or 'other',
@@ -499,8 +501,8 @@ MENU = [('./', 'Cryptoole（未解決暗号のオープン検索）', 'Cryptoole
         ('/crypt/timeline/', '未解読暗号系サイトの更新状況', 'Updates on unsolved-cipher sites'),
         ('spec.html', 'データフォーマット仕様案', 'Data format (draft)'),
         ('https://github.com/satorunet/cryptoole', 'ソースコード（GitHub）', 'Source code (GitHub)'), ('/crypt/', 'crypt トップ', 'crypt home')]
-SORTS = [('date', ('暗号の年代', 'Cipher date')), ('solved', ('解決日', 'Solved date')), ('added', ('追加日', 'Date added')),
-         ('size', ('シリーズの件数', 'Series size')), ('pages', ('総頁数', 'Total pages'))]   # each with its own default direction (DIRDEF in the page script)
+SORTS = [('date', ('年代', 'Date')), ('solved', ('解読日', 'Solved')), ('added', ('登録日', 'Added')),
+         ('size', ('収録数', 'Records')), ('pages', ('頁数', 'Pages'))]   # each with its own default direction (DIRDEF in the page script)
 def solved_key(s):
     """'19 September 2026' -> '2026-09-19', 'March 2021' -> '2021-03-00', '2023' -> '2023-00-00'."""
     m = re.match(r'(?:(\d{1,2}) )?([A-Za-z]+)\.? (\d{4})$', s)
@@ -612,7 +614,7 @@ def facet_rows(rs):
     for f in F: cc[f[3]] = cc.get(f[3], 0) + 1
     n = lambda col, v: sum(1 for r in rs if (v in r['srcs'] if col == 'src' else r[col] == v))
     TY = {'cipher': ('暗号文', 'Ciphertext'), 'key': ('鍵', 'Key'), 'manual': ('手引き', 'Manual'), 'other': ('その他', 'Other')}
-    return [('cat', ('状況', 'Status'), [(k, CAT[k][:2], sum(1 for r in rs if TOP[r['cat']] == k)) for k in ('open', 'solved', 'na')]),
+    return [('cat', ('状況', 'Status'), [(k, CAT[k][:2], sum(1 for r in rs if TOP[r['cat']] == k)) for k in ('open', 'solved', 'ref', 'na')]),
             ('type', ('種類', 'Type'), [(k, v, n('rtype', k)) for k, v in TY.items()]),
             ('src', ('出典', 'Source'), [(k, v[:2], n('src', k)) for k, v in SRC.items()]),
             ('lang', ('言語', 'Language'), [(k, LANG[k], lc[k]) for k in sorted(LANG, key=lambda k: (k == 'xx', -lc[k]))]),
@@ -632,7 +634,8 @@ _SV = lambda d: f'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="t
 SICON = {'all': _SV('<path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/>'),
          'open': _SV('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
          'solved': _SV('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/>'),
-         'na': _SV('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17.5h.01"/>')}
+         'na': _SV('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17.5h.01"/>'),
+         'ref': _SV('<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3"/><path d="m16 7 3 3"/><path d="m14 9 2 2"/>')}
 
 def selects(rs):
     o = lambda v, ja, en, sel='': f'<option value="{v}" data-ja="{e(ja)}" data-en="{e(en)}"{sel}>{e(ja)}</option>'
@@ -669,7 +672,7 @@ def selects(rs):
             + f'<div class="advf"><span id="advcount"></span><button type="button" class="advok" id="advok">{T("結果を見る", "Show results")}</button></div></dialog>')
 
 
-PRIO = ['open', 'part', 'key', 'solved', 'na']   # a group shows its "least solved" member's status
+PRIO = ['open', 'part', 'key', 'solved', 'na', 'ref']   # a group shows its "least solved" member's status
 def decode_names(db):
     """DECODE record id -> its record name (e.g. 'ASFi_SIIVol1_12', 'Codice_Amadi_1269_pt01')."""
     out = {}
@@ -992,7 +995,7 @@ def build(db):
             '.seg a,.seg button{text-decoration:none;font:inherit;font-size:13.5px;border:0;border-right:1px solid var(--line);background:var(--paper);color:var(--ink);padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}'
             '.seg a:last-child,.seg button:last-child{border-right:0}.seg a i,.seg button i{width:9px;height:9px;border-radius:50%;display:inline-block}.seg a b,.seg button b{font-weight:600;color:var(--muted)}'
             '.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.seg [data-cat] svg{color:var(--ic,currentColor)}'
-            '.seg.cats a.zero{opacity:.45}.seg.cats{display:grid;grid-template-columns:repeat(4,1fr);width:100%;max-width:none}.bar1 .brk{flex-basis:100%;height:0}'
+            '.seg.cats a.zero{opacity:.45}.seg.cats{display:grid;grid-template-columns:repeat(5,1fr);width:100%;max-width:none}.bar1 .brk{flex-basis:100%;height:0}'
             '.seg.cats a[data-cat]{flex-direction:column;justify-content:center;align-items:center;gap:2px;padding:6px 4px 5px;line-height:1.1}'
             '.seg [data-cat] .ti{display:inline-flex;align-items:center;gap:6px}.seg [data-cat] .tl{font-size:10.5px;letter-spacing:.06em;font-weight:600;color:var(--ic,var(--muted))}'
             '.seg [data-cat][aria-pressed="false"] .tl{opacity:.8}'
@@ -1050,7 +1053,7 @@ def build(db):
         grp = r['grp'] if r['src'] not in ('cyphersolver', 'decode') else ''
         meta = ' · '.join(x for x in (r['shelfmark'], ltxt, REG[reg][0]) if x)   # Japanese: the shelfmark is the only English kept (a shared key)
         meta_en = ' · '.join(x for x in (r['shelfmark'], ltxt_en, REG[reg][1], grp) if x)
-        if r['cat'] not in ('open', 'na') and (r['solved_on'] or r['solved_by']):
+        if r['cat'] not in ('open', 'na', 'ref') and (r['solved_on'] or r['solved_by']):
             lab = {'solved': ('解決', 'Solved'), 'part': ('一部解決', 'Partly solved'), 'key': ('鍵の特定', 'Key found')}[r['cat']]
             sj = f'{lab[0]}：' + '・'.join(x for x in (fmt_when(r['solved_on']), honor(r['solved_by'])) if x)
             se = f'{lab[1]}: ' + ', '.join(x for x in (fmt_when(r['solved_on'], True), r['solved_by']) if x)
@@ -1058,7 +1061,7 @@ def build(db):
             meta_en = se + (' · ' + meta_en if meta_en else '')
         if r['gone']:
             meta += f' · 一覧から外れた（{r["last_seen"]}）'; meta_en += f' · no longer listed ({r["last_seen"]})'
-        x = dict(i=f'{r["src"]}:{r["key"]}', k=r['sortdate'] or '', s=solved_key(r['solved_on']) if r['cat'] not in ('open', 'na') else '', a=r['first_seen'],
+        x = dict(i=f'{r["src"]}:{r["key"]}', k=r['sortdate'] or '', s=solved_key(r['solved_on']) if r['cat'] not in ('open', 'na', 'ref') else '', a=r['first_seen'],
                  c=r['cat'], S=r['srcs'], L=langs, R=reg, C=cen, y=r['rtype'], dj=fmt_date(r), de=fmt_date(r, True),
                  tj=notitle_year(tj), te=notitle_year(r['title_en'], True), u=r['url'], mj=meta, me=meta_en)
         if r['note_ja']: x['n'] = r['note_ja']
@@ -1084,7 +1087,7 @@ def build(db):
             x['m'] = [[o['u'], o['dj'], o['de'], o['mj'], o['me'], o['c'], o['i'], o['tj'], o['te'], NAMES.get(o['i'], '')] for o in ox]
             x['mk'] = 'same'
             x['sd'] = x.get('sd', []) + [z for o in ox for z in o.get('sd', [])]
-            BEST = ['solved', 'part', 'key', 'open', 'na']   # the same cipher read elsewhere counts as read
+            BEST = ['solved', 'part', 'key', 'open', 'na', 'ref']   # the same cipher read elsewhere counts as read
             best = min([x] + ox, key=lambda z: BEST.index(z['c']))
             if BEST.index(best['c']) < BEST.index(x['c']):
                 x['c0'] = x['c']   # the main source's own status, shown on its record line
@@ -1144,7 +1147,7 @@ def build(db):
             f'<li>{T("出典を取り直すたびに、各項目の状況を更新する。一覧から外れた項目も消さずに記録する。", "Each refresh updates every entry’s status; entries that drop off a list are kept and marked.")}</li>'
             f'<li>{T("状況は「未解決」「解決」「不明」の3つ。一部だけ読めたものは「未解決｜一部」、鍵だけ分かっているものは「未解決｜鍵のみ」と付記する。DECODE で状況が記されていない記録（鍵の多く）は「不明」。", "Three classes: unsolved, solved and unknown. Partly read entries show “unsolved | partly”, those with only the key known “unsolved | key only”; DECODE records without a status (most keys) are “unknown”.")}</li>'
             f'<li>{T("DECODE の全記録（暗号文・鍵・手引き）を含む。種類は詳細検索で絞り込める。Cryptiana や cyphersolver の項目が DECODE の記録番号や同じ所蔵番号・葉を挙げている場合は、1行にまとめる。", "All DECODE records (ciphertexts, keys, manuals) are included; filter by type under Advanced search. Where a Cryptiana or cyphersolver entry cites a DECODE record number or the same shelfmark and folio, they share one row.")}</li>'
-            f'<li>{T("出典・言語・地域・世紀は「詳細検索」で横断して絞り込める。並び順はアイコンから、暗号の年代・解決日・追加日を選べる。", "Filter across sources by source, language, region and century under “Advanced search”; the order button offers cipher date, solve date and date added.")}</li>'
+            f'<li>{T("出典・言語・地域・世紀は「詳細検索」で横断して絞り込める。並び順はアイコンから、年代・解読日・登録日・収録数・頁数を選べる。", "Filter across sources by source, language, region and century under “Advanced search”; the order button offers cipher date, solve date and date added.")}</li>'
             '</ul></div></details>'
             f'<details class="acc" open id="sources"><summary>{T("出典と取得について", "Sources and data")}</summary><div class="accb">'
             + srcs +
@@ -1163,7 +1166,7 @@ def build(db):
     MJ = json.dumps({k: [m, c, SRC[k][2], SRC[k][0], SRC[k][1]] for k, (m, c) in MARK.items()}, ensure_ascii=False)
     js = ("var q=document.getElementById('q'),ul=document.getElementById('ul'),more=document.getElementById('more'),"
           "PAGE=100,f={cat:'all',src:'all',type:'all',lang:'all',reg:'all',cen:'all',ctry:'all',sys:'all'},ADV=['src','type','lang','reg','cen','ctry','sys'],DEF='solved',DIRDEF={date:'asc',solved:'desc',added:'desc',size:'desc',pages:'desc'},mode=DEF,dir=DIRDEF[DEF],P={cat:'status',src:'source',type:'type',lang:'language',reg:'region',cen:'century',ctry:'country',sys:'system'};"
-          "var CAT=" + CJ + ",TOP={open:'open',part:'open',key:'open',solved:'solved',na:'na'},MK=" + MJ + ",SI=" + SIJ + ";"
+          "var CAT=" + CJ + ",TOP={open:'open',part:'open',key:'open',solved:'solved',na:'na',ref:'ref'},MK=" + MJ + ",SI=" + SIJ + ";"
           "function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c];});}"
           "function T(a,b){return '<span class=\"t\" lang=\"ja\">'+a+'</span><span class=\"t\" lang=\"en\">'+b+'</span>';}"
           "function mark(s){var m=MK[s];return '<span class=\"mk\" title=\"'+esc(m[3])+' / '+esc(m[4])+'\" aria-label=\"'+esc(m[4])+'\"><svg viewBox=\"0 0 30 16\" width=\"30\" height=\"16\" aria-hidden=\"true\"><rect width=\"30\" height=\"16\" rx=\"8\" fill=\"'+m[1]+'\"/><text x=\"15\" y=\"11.6\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"700\" font-family=\"system-ui,sans-serif\" fill=\"#fff\">'+m[0]+'</text></svg></span>';}"
@@ -1171,10 +1174,10 @@ def build(db):
           "var TY={key:'<span class=\"ty\" title=\"鍵 / Key\" aria-label=\"鍵 / Key\"><svg viewBox=\"0 0 24 24\" width=\"15\" height=\"15\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"7.5\" cy=\"15.5\" r=\"4.5\"/><path d=\"m10.7 12.3 9.3-9.3M17 6l3 3M14.5 8.5l2 2\"/></svg></span>',manual:'<span class=\"ty\" title=\"手引き / Manual\" aria-label=\"手引き / Manual\"><svg viewBox=\"0 0 24 24\" width=\"15\" height=\"15\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z\"/><path d=\"M4 19V5\"/></svg></span>'};"
           "function row(x){var dd=x.dj&&x.dj!=='—';return '<li class=\"'+(x.x?'gone':'')+'\"><div><div class=\"hd\"><div class=\"hr\">'+badge(x.c)+'<span class=\"mks\">'+x.S.map(mark).join('')+'</span></div><span class=\"tt\">'"
           "+'<a class=\"ja\" href=\"case.html?id='+encodeURIComponent(x.i)+'\">'+T(esc(x.tj),esc(x.te))+'</a>'+'</span></div>'"
-          "+(x.n?'<div class=\"nt t\" lang=\"ja\">'+esc(x.n)+'</div>':'')+'<div class=\"m\">'+(dd?'<span class=\"dt\">'+T(esc(x.dj),esc(x.de))+'</span>'+(x.mj?' · ':''):'')+T(esc(x.mj),esc(x.me))+(x.pg?' · <span class=\"pgc\">'+(x.mn&&x.mk!=='same'?T('計 '+x.pg.toLocaleString()+'頁','total '+x.pg.toLocaleString()+' pp.'):T(x.pg.toLocaleString()+'頁',x.pg.toLocaleString()+' pp.'))+'</span>':'')+'</div>'"
+          "+(x.n?'<div class=\"nt t\" lang=\"ja\">'+esc(x.n)+'</div>':'')+'<div class=\"m\">'+(dd?'<span class=\"dt\">'+T(esc(x.dj),esc(x.de))+'</span>'+(x.mj?' · ':''):'')+T(esc(x.mj),esc(x.me))+(x.pg&&!(x.mn&&x.mk!=='same')?' · <span class=\"pgc\">'+T(x.pg.toLocaleString()+'頁',x.pg.toLocaleString()+' pp.')+'</span>':'')+'</div>'"
           "+(x.o||[]).map(function(o){return '<div class=\"also\">'+mark(o[0])+'<a href=\"'+esc(o[1])+'\">'+T(esc(o[2]),esc(o[3]))+'</a></div>';}).join('')"
           "+(x.mn?''"
-          "+'<details class=\"grpd\" data-id=\"'+esc(x.i)+'\"><summary>'+(x.mk==='vol'?T('同じ巻・シリーズの記録 ほか '+x.mn+' 件','+ '+x.mn+' more records in this series'):x.mk==='same'?T('関連する記録 ほか '+x.mn+' 件','+ '+x.mn+' related records'):T('同じ題名の記録 ほか '+x.mn+' 件','+ '+x.mn+' more records with this title'))+(x.pc?pbar(x.pc):'')+'</summary><div class=\"qv\">…</div></details>':'')+'</div></li>';}"
+          "+'<details class=\"grpd\" data-id=\"'+esc(x.i)+'\"><summary>'+(x.mk==='vol'?T('収録 '+(x.mn+1).toLocaleString()+'件'+(x.pg?'・計 '+x.pg.toLocaleString()+'頁':''),(x.mn+1).toLocaleString()+' records'+(x.pg?' · '+x.pg.toLocaleString()+' pp.':'')):x.mk==='same'?T('関連する記録 ほか '+x.mn+' 件','+ '+x.mn+' related records'):T('収録 '+(x.mn+1).toLocaleString()+'件'+(x.pg?'・計 '+x.pg.toLocaleString()+'頁':'')+'（同じ題名）',(x.mn+1).toLocaleString()+' records'+(x.pg?' · '+x.pg.toLocaleString()+' pp.':'')+' with this title'))+(x.pc?pbar(x.pc):'')+'</summary><div class=\"qv\">…</div></details>':'')+'</div></li>';}"
           "function sfile(id){return 'c/'+id.replace(/[^A-Za-z0-9]+/g,'-')+'.json?v='+BV;}"
           "function pbar(c){if(!c[0]&&!c[1])return '';var n=c[0]+c[1]+c[2],K=['solved','open','na'],pc=function(v){var r=v*100/n;return r>0&&r<1?'<1%':r>99&&r<100?'>99%':Math.round(r)+'%';};return ' <span class=\"pbw\">'+(c.filter(function(v){return v;}).length>1?'<span class=\"pbar\" aria-hidden=\"true\">'+K.map(function(k,i){return c[i]?'<i style=\"width:'+(c[i]*100/n)+'%;background:'+CAT[k][2]+'\"></i>':'';}).join('')+'</span>':'')+'<span class=\"pct\">'+[[c[0],T('解決 ','solved ')],[c[1],T('未解決 ','unsolved ')],[c[2],T('不明 ','unknown ')]].filter(function(z){return z[0];}).map(function(z){return z[1]+pc(z[0]);}).join(' · ')+'</span></span>';}"
           "function quick(x){return x.mk==='vol'&&x.nm?series(x):'<ul>'+x.m.map(function(m){var sc=m[6].split(':')[0];return '<li>'+badge(m[5])+(MK[sc]?mark(sc):'')+'<a href=\"'+esc(m[0])+'\">'+esc(sc==='decode'?m[6].replace('decode:','R'):(m[7]||m[6]))+'</a> '+T(esc(m[1]),esc(m[2]))+(m[3]&&m[3]!==x.mj?' · '+T(esc(m[3]),esc(m[4])):'')+'</li>';}).join('')+'</ul>';}"
@@ -1203,7 +1206,7 @@ def build(db):
           "function run(keep){advn();if(window.save)save();if(window.conds)conds();if(!D)return;var off=keep?ul.children.length:0;"
           "if(!keep){var w=q.value.trim().toLowerCase().split(/\\s+/).filter(Boolean).slice(0,8);"
           "var fld={date:'k',solved:'s',added:'a'}[mode]||'k',up=dir==='asc',sg=up?-1:1;"
-          "hits=D.filter(function(x){return ok(x,w);});var cc={all:0,open:0,solved:0,na:0};D.forEach(function(x){if(ok(x,w,1)){cc.all++;cc[TOP[x.c]]++;}});document.querySelectorAll('.seg [data-cat]').forEach(function(t){var e=t.querySelector('.ti b');if(e)cup(e,cc[t.dataset.cat]||0);t.classList.toggle('zero',!cc[t.dataset.cat]);});if(mode==='pages')hits.sort(function(a,b){if(!a.pg!==!b.pg)return a.pg?-1:1;return sg*((b.pg||0)-(a.pg||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else if(mode==='size')hits.sort(function(a,b){return sg*((b.mn||0)-(a.mn||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else hits.sort(function(a,b){var x=a[fld]||'',y=b[fld]||'';if(x===y)return a.k<b.k?-1:(a.k>b.k?1:(a.i<b.i?-1:1));if(!x)return 1;if(!y)return -1;return up?(x<y?-1:1):(x<y?1:-1);});total=hits.length;}"
+          "hits=D.filter(function(x){return ok(x,w);});var cc={all:0,open:0,solved:0,na:0,ref:0};D.forEach(function(x){if(ok(x,w,1)){cc.all++;cc[TOP[x.c]]++;}});document.querySelectorAll('.seg [data-cat]').forEach(function(t){var e=t.querySelector('.ti b');if(e)cup(e,cc[t.dataset.cat]||0);t.classList.toggle('zero',!cc[t.dataset.cat]);});if(mode==='pages')hits.sort(function(a,b){if(!a.pg!==!b.pg)return a.pg?-1:1;return sg*((b.pg||0)-(a.pg||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else if(mode==='size')hits.sort(function(a,b){return sg*((b.mn||0)-(a.mn||0))||(a.k<b.k?-1:(a.k>b.k?1:0));});else hits.sort(function(a,b){var x=a[fld]||'',y=b[fld]||'';if(x===y)return a.k<b.k?-1:(a.k>b.k?1:(a.i<b.i?-1:1));if(!x)return 1;if(!y)return -1;return up?(x<y?-1:1):(x<y?1:-1);});total=hits.length;}"
           "var page=hits.slice(off,off+(off?PAGE*2:PAGE)),h=page.map(row).join('');if(keep)ul.insertAdjacentHTML('beforeend',h);else ul.innerHTML=h;for(var z=off;z<ul.children.length;z++)hl(ul.children[z]);"
           "ul.removeAttribute('aria-busy');more.hidden=ul.children.length>=total;document.getElementById('nohit').hidden=total>0;var hn=document.getElementById('hitn'),act=q.value.trim()||f.cat!=='all'||ADV.some(function(g){return f[g]!=='all';});hn.hidden=!act||!total;if(act)hn.innerHTML='<svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m15.5 15.5 5 5\"/></svg>'"
           "+'<span class=\"hl\">'+T('検索結果','Results')+'</span><b>'+total.toLocaleString()+'</b><span class=\"hu\">'+T('件',total===1?'match':'matches')+'</span>'"
@@ -1236,10 +1239,10 @@ def build(db):
           "var LBL={q:['検索','Search'],cat:['状況','Status'],src:['出典','Source'],type:['種類','Type'],ctry:['国','Country'],sys:['方式','System'],lang:['言語','Language'],reg:['地域','Region'],cen:['世紀','Century'],sort:['並び順','Order']};"
           "function txt(el){var l=document.documentElement.dataset.ui==='en'?'en':'ja';var o=el&&el.querySelector('.t[lang=\"'+l+'\"]');return o?o.textContent:(el?el.textContent:'');}"
           "window.conds=function(){var l=document.documentElement.dataset.ui==='en'?1:0,box=document.getElementById('conds'),h=[];"
-          "function chip(k,v){h.push('<span class=\"cond\"><span>'+LBL[k][l]+'：<b></b></span><button type=\"button\" data-x=\"'+k+'\" aria-label=\"×\">×</button></span>');vals.push(v);}var vals=[];"
+          "function chip(k,v,lb){h.push('<span class=\"cond\"><span>'+(lb||LBL[k][l])+'：<b></b></span><button type=\"button\" data-x=\"'+k+'\" aria-label=\"×\">×</button></span>');vals.push(v);}var vals=[];"
           "var qv=q.value.trim();"
           "function lbl(sel,v){return String(v).split(',').map(function(z){var e=document.querySelector(sel.replace('#',z));return e?(e.tagName==='OPTION'?e.textContent.replace(/[（(]\\d+[）)]$/,''):txt(e).replace(/\\s*\\d+$/,'')):z;}).join('・');}"
-          "if(f.cat!=='all')chip('cat',lbl('.seg [data-cat=\"#\"]',f.cat));"
+          "if(f.cat==='ref')chip('cat',['鍵・資料','keys and references'][l],['区分','Class'][l]);else if(f.cat!=='all')chip('cat',lbl('.seg [data-cat=\"#\"]',f.cat));"
           "ADV.forEach(function(g){var s=document.querySelector('select[data-g=\"'+g+'\"]');s.classList.toggle('on',f[g]!=='all');if(f[g]!=='all')chip(g,lbl('select[data-g=\"'+g+'\"] option[value=\"#\"]',f[g]));});"
           ""
           "document.getElementById('advbtn').classList.toggle('on',ADV.some(function(g){return f[g]!=='all';}));"
