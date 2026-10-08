@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS entries(
   title_en TEXT NOT NULL, grp TEXT NOT NULL DEFAULT '',
   date_text TEXT NOT NULL DEFAULT '', year INTEGER, sortdate TEXT NOT NULL DEFAULT '',
   language TEXT NOT NULL DEFAULT '', shelfmark TEXT NOT NULL DEFAULT '',
-  cat TEXT NOT NULL CHECK(cat IN ('open','part','key','solved','na','ref')), status_src TEXT NOT NULL DEFAULT '',
+  cat TEXT NOT NULL CHECK(cat IN ('open','part','key','solved','ptx','na','ref')), status_src TEXT NOT NULL DEFAULT '',
   url TEXT NOT NULL, slug TEXT NOT NULL DEFAULT '',
   first_seen TEXT NOT NULL, last_seen TEXT NOT NULL, gone INTEGER NOT NULL DEFAULT 0,
   solved_on TEXT NOT NULL DEFAULT '', solved_by TEXT NOT NULL DEFAULT '', rtype TEXT NOT NULL DEFAULT 'cipher',
@@ -54,8 +54,9 @@ SRC = {'cryptiana': ('Cryptiana（S. Tomokiyo）', 'Cryptiana (S. Tomokiyo)', 'h
 TABL = {'all': ('全て', 'All'), 'open': ('未解読', 'Unsolved'), 'solved': ('解読済', 'Solved'), 'na': ('不明', 'Unknown'), 'ref': ('鍵・資料', 'Keys')}   # tiny labels under the status tabs
 CAT = {'open': ('未解決', 'unsolved', '#a3161b'), 'part': ('一部', 'partly', '#b7791f'),
        'key': ('鍵のみ', 'key only', '#3b6fb0'), 'solved': ('解決', 'solved', '#2e7d4f'), 'na': ('状況不明', 'status unknown', '#7a7468'),
-       'ref': ('鍵・資料', 'key / reference', '#5b6fb0')}   # DECODE key and manual records: not ciphertexts to solve (2026-10-08)
-TOP = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'na': 'na', 'ref': 'ref'}   # shown as two classes; part/key become a qualifier on 未解決
+       'ref': ('鍵・資料', 'key / reference', '#5b6fb0'),   # DECODE key and manual records: not ciphertexts to solve (2026-10-08)
+       'ptx': ('平文あり', 'plaintext attached', '#4f8f63')}   # DECODE status N/A but a plaintext is attached: counted as solved, with this qualifier (user 2026-10-08)
+TOP = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'ptx': 'solved', 'na': 'na', 'ref': 'ref'}   # shown as two classes; part/key become a qualifier on 未解決
 def badge(cat):
     top = TOP[cat]
     q = f'<span class="q q-{cat}">{T(*CAT[cat][:2])}</span>' if cat != top else ''
@@ -68,7 +69,7 @@ MON = {m: i for i, m in enumerate(['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'ju
 def connect():
     db = sqlite3.connect(DB, timeout=120); db.row_factory = sqlite3.Row; db.execute('PRAGMA journal_mode=WAL'); db.executescript(SCHEMA)
     cols = {r[1] for r in db.execute('PRAGMA table_info(entries)')}
-    if "'ref'" not in db.execute("SELECT sql FROM sqlite_master WHERE name='entries'").fetchone()[0]:   # widen the status CHECK (2026-10-05 'na', 2026-10-08 'ref')
+    if "'ptx'" not in db.execute("SELECT sql FROM sqlite_master WHERE name='entries'").fetchone()[0]:   # widen the status CHECK (2026-10-05 'na', 2026-10-08 'ref', 'ptx')
         old = [r[1] for r in db.execute('PRAGMA table_info(entries)')]
         db.executescript('ALTER TABLE entries RENAME TO entries_old;' + SCHEMA)
         new = [r[1] for r in db.execute('PRAGMA table_info(entries)')]
@@ -258,6 +259,7 @@ def decode(db=None):
         lm = re.findall(r'<b>(?:Cleartext|Plaintext):</b>([^<]*)', L.get('c_lang') or '')
         cat, st = DEC_ST.get(L.get('status') or '', ('na', ''))
         if ty in ('key', 'manual') and cat == 'na': cat, st = 'ref', 'Key / manual (no decryption status)'   # a key is not a cipher to solve (user 2026-10-08)
+        elif cat == 'na' and R.get('inline_plaintext') == 'True': cat, st = 'ptx', 'N/A (plaintext attached)'   # no status given, but a plaintext is on the record (user 2026-10-08)
         yield dict(key=str(i), title_en=t, grp=origin, date_text=dt, year=int(sy) if sy else None, sortdate=sortdate(dt),
                    language=', '.join(x.strip() for x in lm if x.strip()), shelfmark=', '.join(x for x in (city, holder) if x).strip(' ,'),
                    cat=cat, status_src=st or 'N/A', url=f'https://de-crypt.org/decrypt-web/RecordsView/{i}', rtype=ty or 'other',
@@ -672,7 +674,7 @@ def selects(rs):
             + f'<div class="advf"><span id="advcount"></span><button type="button" class="advok" id="advok">{T("結果を見る", "Show results")}</button></div></dialog>')
 
 
-PRIO = ['open', 'part', 'key', 'solved', 'na', 'ref']   # a group shows its "least solved" member's status
+PRIO = ['open', 'part', 'key', 'ptx', 'solved', 'na', 'ref']   # a group shows its "least solved" member's status
 def decode_names(db):
     """DECODE record id -> its record name (e.g. 'ASFi_SIIVol1_12', 'Codice_Amadi_1269_pt01')."""
     out = {}
@@ -1054,7 +1056,7 @@ def build(db):
         meta = ' · '.join(x for x in (r['shelfmark'], ltxt, REG[reg][0]) if x)   # Japanese: the shelfmark is the only English kept (a shared key)
         meta_en = ' · '.join(x for x in (r['shelfmark'], ltxt_en, REG[reg][1], grp) if x)
         if r['cat'] not in ('open', 'na', 'ref') and (r['solved_on'] or r['solved_by']):
-            lab = {'solved': ('解決', 'Solved'), 'part': ('一部解決', 'Partly solved'), 'key': ('鍵の特定', 'Key found')}[r['cat']]
+            lab = {'solved': ('解決', 'Solved'), 'part': ('一部解決', 'Partly solved'), 'key': ('鍵の特定', 'Key found'), 'ptx': ('平文あり', 'Plaintext attached')}[r['cat']]
             sj = f'{lab[0]}：' + '・'.join(x for x in (fmt_when(r['solved_on']), honor(r['solved_by'])) if x)
             se = f'{lab[1]}: ' + ', '.join(x for x in (fmt_when(r['solved_on'], True), r['solved_by']) if x)
             meta = sj + (' · ' + meta if meta else '')
@@ -1087,7 +1089,7 @@ def build(db):
             x['m'] = [[o['u'], o['dj'], o['de'], o['mj'], o['me'], o['c'], o['i'], o['tj'], o['te'], NAMES.get(o['i'], '')] for o in ox]
             x['mk'] = 'same'
             x['sd'] = x.get('sd', []) + [z for o in ox for z in o.get('sd', [])]
-            BEST = ['solved', 'part', 'key', 'open', 'na', 'ref']   # the same cipher read elsewhere counts as read
+            BEST = ['solved', 'ptx', 'part', 'key', 'open', 'na', 'ref']   # the same cipher read elsewhere counts as read
             best = min([x] + ox, key=lambda z: BEST.index(z['c']))
             if BEST.index(best['c']) < BEST.index(x['c']):
                 x['c0'] = x['c']   # the main source's own status, shown on its record line
@@ -1166,7 +1168,7 @@ def build(db):
     MJ = json.dumps({k: [m, c, SRC[k][2], SRC[k][0], SRC[k][1]] for k, (m, c) in MARK.items()}, ensure_ascii=False)
     js = ("var q=document.getElementById('q'),ul=document.getElementById('ul'),more=document.getElementById('more'),"
           "PAGE=100,f={cat:'all',src:'all',type:'all',lang:'all',reg:'all',cen:'all',ctry:'all',sys:'all'},ADV=['src','type','lang','reg','cen','ctry','sys'],DEF='solved',DIRDEF={date:'asc',solved:'desc',added:'desc',size:'desc',pages:'desc'},mode=DEF,dir=DIRDEF[DEF],P={cat:'status',src:'source',type:'type',lang:'language',reg:'region',cen:'century',ctry:'country',sys:'system'};"
-          "var CAT=" + CJ + ",TOP={open:'open',part:'open',key:'open',solved:'solved',na:'na',ref:'ref'},MK=" + MJ + ",SI=" + SIJ + ";"
+          "var CAT=" + CJ + ",TOP={open:'open',part:'open',key:'open',solved:'solved',ptx:'solved',na:'na',ref:'ref'},MK=" + MJ + ",SI=" + SIJ + ";"
           "function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c];});}"
           "function T(a,b){return '<span class=\"t\" lang=\"ja\">'+a+'</span><span class=\"t\" lang=\"en\">'+b+'</span>';}"
           "function mark(s){var m=MK[s];return '<span class=\"mk\" title=\"'+esc(m[3])+' / '+esc(m[4])+'\" aria-label=\"'+esc(m[4])+'\"><svg viewBox=\"0 0 30 16\" width=\"30\" height=\"16\" aria-hidden=\"true\"><rect width=\"30\" height=\"16\" rx=\"8\" fill=\"'+m[1]+'\"/><text x=\"15\" y=\"11.6\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"700\" font-family=\"system-ui,sans-serif\" fill=\"#fff\">'+m[0]+'</text></svg></span>';}"

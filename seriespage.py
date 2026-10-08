@@ -25,7 +25,7 @@ def js_functions(js, names):
 def write(CSS, head, BAR, LANGJS, js, CJ, MJ, SIJ, T, menu_links):
     lib = js_functions(js, ['esc', 'T', 'mark', 'badge', 'norm', 'series'])
     page_js = (
-        f"var CAT={CJ},TOP={{open:'open',part:'open',key:'open',solved:'solved',na:'na',ref:'ref'}},MK={MJ},SI={SIJ};" + lib +
+        f"var CAT={CJ},TOP={{open:'open',part:'open',key:'open',solved:'solved',ptx:'solved',na:'na',ref:'ref'}},MK={MJ},SI={SIJ};" + lib +
         "var box=document.getElementById('sp'),id=new URLSearchParams(location.search).get('id');"
         "function L(){return document.documentElement.dataset.ui==='en'?1:0;}"
         "function rows(x){return [[x.u,x.dj,x.de,x.mj,x.me,x.c0||x.c,x.i,x.tj0||x.tj,x.te0||x.te,x.nm||'',x.cr,x.pid,x.pg||0]].concat(x.m||[]);}"

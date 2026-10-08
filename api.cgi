@@ -10,9 +10,9 @@ from pathlib import Path
 DB = Path(__file__).resolve().parent / 'serve.sqlite'
 SORT = {'date': ("k = ''", 'k ASC'), 'date-desc': ("k = ''", 'k DESC'), 'solved': ("s = ''", 's DESC'),
         'solved-asc': ("s = ''", 's ASC'), 'added': ("a = ''", 'a DESC')}
-TOP = {'open': ('open', 'part', 'key'), 'solved': ('solved',), 'na': ('na',), 'ref': ('ref',)}
-TOPOF = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'na': 'na', 'ref': 'ref'}
-DETAIL = {'open': None, 'part': 'partly', 'key': 'key_only', 'solved': None, 'na': None, 'ref': None}
+TOP = {'open': ('open', 'part', 'key'), 'solved': ('solved', 'ptx'), 'na': ('na',), 'ref': ('ref',)}
+TOPOF = {'open': 'open', 'part': 'open', 'key': 'open', 'solved': 'solved', 'ptx': 'solved', 'na': 'na', 'ref': 'ref'}
+DETAIL = {'open': None, 'part': 'partly', 'key': 'key_only', 'solved': None, 'ptx': 'plaintext_attached', 'na': None, 'ref': None}
 
 def readable(x):
     """Public field names (the page itself asks for compact=1 and gets the short keys)."""
