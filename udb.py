@@ -500,6 +500,7 @@ def fmt_when(s, en=False):
     return s if en else (s + '年' if re.fullmatch(r'\d{4}', s) else s)
 
 MENU = [('./', 'Cryptoole（未解決暗号のオープン検索）', 'Cryptoole (open search for unsolved ciphers)'), ('stats.html', '未解読暗号の解読状況統計', 'Decipherment statistics'),
+        ('stats.html#who', '解読ランキング', 'Decipherment ranking'),
         ('/crypt/timeline/', '未解読暗号系サイトの更新状況', 'Updates on unsolved-cipher sites'),
         ('spec.html', 'データフォーマット仕様案', 'Data format (draft)'),
         ('https://github.com/satorunet/cryptoole', 'ソースコード（GitHub）', 'Source code (GitHub)'), ('/crypt/', 'crypt トップ', 'crypt home')]
