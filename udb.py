@@ -103,7 +103,7 @@ def slug_for(*texts):
 
 # when a Cryptiana entry was solved: the first dated sentence that reports a solution (as Tomokiyo wrote it)
 M='January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec'
-ACT=r'\b(?:solved|deciphered|decrypted|broken|broke|cracked|notified me of (?:his|her|their) (?:full )?solution|published (?:his|her|their|a|the)? ?(?:full )?(?:solution|decipherment)|provided me with|solution (?:by|was)|was solved|found the key|finding the key|results were published|[Ss]olution of .{0,220}? was published|reads this)\b'
+ACT=r'\b(?:solved|deciphered|decrypted|broken|broke|cracked|notified me of (?:his|her|their) (?:full )?solution|published (?:his|her|their|a|the)? ?(?:full )?(?:solution|decipherment)|published a (?:connected|partial|full) reading|provided me with|solution (?:by|was)|was solved|found the key|finding the key|results were published|[Ss]olution of .{0,220}? was published|reads this)\b'
 NEG=r'\b(?:undeciphered|unsolved|remains?|appears?|seems?|not been|yet to)\b'
 def solved_info(body, by=''):
     m=re.search(r'Decipherments? (?:was|were|has been|have been) published by .+? by ('+M+r') (\d{4})\.(?=\s|$)',body)   # "... published by X, Y and Z by October 2026."
@@ -111,8 +111,12 @@ def solved_info(body, by=''):
     sents=re.split(r'(?<!\s[A-Z]\.)(?<=[.!?])\s+',body)   # not after an initial ("Lawren M. Smithline")
     good=[s for s in sents if re.search(ACT,s,re.I) and not re.search(NEG,s,re.I)]
     for s in good:
-        for m in re.finditer(r'\b(\d{1,2}) ('+M+r')\.? (\d{4})\b',s):
-            if int(m.group(3))>=1990: return f'{m.group(1)} {m.group(2)} {m.group(3)}',s
+        ds=[m for m in re.finditer(r'\b(\d{1,2}) ('+M+r')\.? (\d{4})\b',s) if int(m.group(3))>=1990]
+        if re.search(r'\bpartial\b',s): ds=ds[::-1]   # "a partial reading on X and … a connected reading on Y": the later one
+        for m in ds: return f'{m.group(1)} {m.group(2)} {m.group(3)}',s
+    for s in good:   # "On 7 October, X notified me …" — Tomokiyo's recent notes give no year: the year of the fetch
+        m=re.search(r'\b(?:On|on) (\d{1,2}) ('+M+r')\b(?!\.? \d{4})',s)
+        if m: return f'{m.group(1)} {m.group(2)} {datetime.date.today().year}',s
     y=re.search(r'\((\d{4})\)',by or '')
     if y: return y.group(1),'by'
     for s in good:
